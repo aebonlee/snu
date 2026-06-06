@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import SEOHead from '../components/SEOHead';
-import { PRESET_TOPICS } from '../data/projectTopics';
+import { PRESET_TOPICS, type Region } from '../data/projectTopics';
 import {
   listCustomTopics, listVotes, addTopic, deleteTopic, castVote, retractVote,
   type CustomTopic, type TopicVote,
 } from '../utils/projectVote';
 import {
   listTeams, findMyTeam, createTeam, joinTeam, leaveTeam, MAX_TEAM_SIZE,
-  claimLeader, resetLeaders,
+  TRACKS, TRACK_CAP, trackCount, claimLeader, resetLeaders,
 } from '../utils/projectTeams';
 import type { Team, TeamMember } from '../types';
 
@@ -20,6 +20,9 @@ interface Row {
   description: string;
   isPreset: boolean;
   ownerId?: string;
+  region?: Region;
+  techTrack?: string;
+  humanTrack?: string;
 }
 
 const ProjectVote = (): ReactElement => {
@@ -33,9 +36,11 @@ const ProjectVote = (): ReactElement => {
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
 
+  const [myTrack, setMyTrack] = useState<string>('기술');
+
   const userName = profile?.name || profile?.display_name || user?.email || '수강생';
   const me = (role: string): TeamMember => ({
-    id: user!.id, name: userName, email: profile?.email || user?.email || '', role,
+    id: user!.id, name: userName, email: profile?.email || user?.email || '', role, track: myTrack,
   });
 
   const reload = useCallback(async () => {
@@ -57,7 +62,10 @@ const ProjectVote = (): ReactElement => {
   }, [votes]);
 
   const rows: Row[] = useMemo(() => {
-    const presetRows: Row[] = PRESET_TOPICS.map((t) => ({ key: t.key, title: t.title, description: t.description, isPreset: true }));
+    const presetRows: Row[] = PRESET_TOPICS.map((t) => ({
+      key: t.key, title: t.title, description: t.description, isPreset: true,
+      region: t.region, techTrack: t.techTrack, humanTrack: t.humanTrack,
+    }));
     const customRows: Row[] = custom.map((c) => ({ key: c.id, title: c.title, description: c.description, isPreset: false, ownerId: c.created_by }));
     return [...presetRows, ...customRows].sort((a, b) => (votersByKey[b.key]?.length || 0) - (votersByKey[a.key]?.length || 0));
   }, [custom, votersByKey]);
@@ -90,8 +98,10 @@ const ProjectVote = (): ReactElement => {
     setBusy(true);
     const res = await joinTeam(team, me('팀원'));
     setBusy(false);
-    if (res.ok) { showToast(`'${team.name}' 팀에 합류했습니다.`, 'success'); reload(); }
-    else showToast(res.error === 'full' ? '정원이 가득 찼습니다.' : '합류 실패: ' + (res.error || ''), 'error');
+    if (res.ok) { showToast(`'${team.name}' 팀에 ${myTrack} 트랙으로 합류했습니다.`, 'success'); reload(); }
+    else if (res.error === 'full') showToast('정원(4명)이 가득 찼습니다.', 'error');
+    else if (res.error?.startsWith('track-full')) showToast(`${myTrack} 트랙은 이미 ${TRACK_CAP}명이 찼습니다. 다른 트랙/팀을 선택하세요.`, 'warning');
+    else showToast('합류 실패: ' + (res.error || ''), 'error');
   };
 
   const handleLeave = async (team: Team) => {
@@ -158,7 +168,7 @@ const ProjectVote = (): ReactElement => {
       <section className="page-header">
         <div className="container">
           <h2>팀구성 · 주제 투표</h2>
-          <p>주제에 투표하면 관심 있는 사람이 모입니다. 바로 팀을 만들거나 합류해 보세요. (1인 1표)</p>
+          <p>서울·제주 지역문제 해결 주제 중 하나를 골라 팀을 구성합니다. <strong>7팀 × 4명(기술 2 + 인문 2)</strong> · 1인 1표</p>
         </div>
       </section>
 
@@ -178,12 +188,30 @@ const ProjectVote = (): ReactElement => {
                 </div>
               )}
 
+              {/* 내 트랙 선택 (팀 생성·합류 시 적용) */}
+              {!isAdmin && !myTeam && (
+                <div style={{ ...card, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 700 }}>내 트랙 선택</span>
+                  {TRACKS.map((tk) => (
+                    <button key={tk} onClick={() => setMyTrack(tk)}
+                      className={myTrack === tk ? 'btn btn-primary' : 'btn btn-secondary'}
+                      style={{ padding: '7px 18px', fontSize: '14px' }}>
+                      {tk === '기술' ? '🛠️ 기술' : '📖 인문'} 트랙
+                    </button>
+                  ))}
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                    선택한 트랙으로 팀 생성·합류합니다. 팀당 트랙별 {TRACK_CAP}명까지.
+                  </span>
+                </div>
+              )}
+
               {rows.map((r, idx) => {
                 const voters = votersByKey[r.key] || [];
                 const mineVote = myVoteKey === r.key;
                 const team = teamForTitle(r.title);
                 const inThisTeam = !!team && !!user && members(team).some((m) => m.id === user.id);
                 const full = !!team && members(team).length >= MAX_TEAM_SIZE;
+                const myTrackFull = !!team && trackCount(members(team), myTrack) >= TRACK_CAP;
                 const canDelete = !r.isPreset && (r.ownerId === user?.id || isAdmin);
                 return (
                   <div key={r.key} style={{ ...card, borderLeft: mineVote ? '4px solid var(--primary-blue)' : '1px solid var(--border-light)' }}>
@@ -191,11 +219,25 @@ const ProjectVote = (): ReactElement => {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                           <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary-blue)' }}>{idx + 1}위</span>
+                          {r.region && <span style={chip(r.region === '서울' ? '#e0edff' : '#e6f4ee', r.region === '서울' ? '#0046C8' : '#00855A')}>{r.region}</span>}
                           <h3 style={{ margin: 0, fontSize: '17px' }}>{r.title}</h3>
                           {!r.isPreset && <span style={chip('var(--bg-light-gray)', 'var(--text-secondary)')}>학생 제안</span>}
                           {team && <span style={chip('#dbeafe', '#1e3a8a')}>팀 결성됨 {members(team).length}/{MAX_TEAM_SIZE}</span>}
                         </div>
                         <p style={{ margin: '6px 0 0', fontSize: '14px', color: 'var(--text-secondary)' }}>{r.description}</p>
+                        {(r.techTrack || r.humanTrack) && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
+                            {r.techTrack && <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}><strong style={{ color: '#0046C8' }}>🛠️ 기술</strong> {r.techTrack}</div>}
+                            {r.humanTrack && <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}><strong style={{ color: '#00855A' }}>📖 인문</strong> {r.humanTrack}</div>}
+                          </div>
+                        )}
+                        {team && (
+                          <div style={{ marginTop: '8px', fontSize: '12.5px', fontWeight: 700 }}>
+                            <span style={{ color: '#0046C8' }}>기술 {trackCount(members(team), '기술')}/{TRACK_CAP}</span>
+                            <span style={{ color: 'var(--text-secondary)', margin: '0 6px' }}>·</span>
+                            <span style={{ color: '#00855A' }}>인문 {trackCount(members(team), '인문')}/{TRACK_CAP}</span>
+                          </div>
+                        )}
                       </div>
                       <div style={{ textAlign: 'center', flexShrink: 0 }}>
                         <div style={{ fontSize: '24px', fontWeight: 800, color: mineVote ? 'var(--primary-blue)' : 'var(--text-primary)' }}>{voters.length}</div>
@@ -232,6 +274,7 @@ const ProjectVote = (): ReactElement => {
                           {members(team).map((m) => (
                             <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                               <span style={chip('#eff6ff', '#1e40af')}>{m.name}</span>
+                              {m.track && <span style={chip(m.track === '기술' ? '#e0edff' : '#e6f4ee', m.track === '기술' ? '#0046C8' : '#00855A')}>{m.track}</span>}
                               {m.role === '팀장' && <span style={chip('#fef3c7', '#92400e')}>👑 팀장</span>}
                               {/* 팀장 미정: 팀원·관리자가 각 이름별로 팀장 신청 */}
                               {!hasLeader && (inThisTeam || isAdmin) && (
@@ -279,8 +322,8 @@ const ProjectVote = (): ReactElement => {
                         </>
                       )}
                       {team && !inThisTeam && !myTeam && !isAdmin && (
-                        <button className="btn btn-secondary" style={{ padding: '8px 18px', fontSize: '14px', opacity: full ? 0.5 : 1 }} disabled={busy || full} onClick={() => handleJoin(team)}>
-                          {full ? '정원 마감' : '이 팀에 합류'}
+                        <button className="btn btn-secondary" style={{ padding: '8px 18px', fontSize: '14px', opacity: (full || myTrackFull) ? 0.5 : 1 }} disabled={busy || full || myTrackFull} onClick={() => handleJoin(team)}>
+                          {full ? '정원 마감' : myTrackFull ? `${myTrack} 트랙 마감` : `${myTrack} 트랙으로 합류`}
                         </button>
                       )}
 

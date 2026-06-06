@@ -341,6 +341,8 @@ export interface TeamMember {
   name: string;
   email: string;
   role: string;
+  /** 트랙: '기술' | '인문' (팀당 각 2명 권장) */
+  track?: string;
 }
 
 export interface Project {

@@ -10,7 +10,14 @@ import type { Team, TeamMember } from '../types';
 export const TEAMS_TABLE = `${site.dbPrefix}teams`;
 export const TEAM_POSTS_TABLE = `${site.dbPrefix}team_posts`;
 export const TEAM_COMMENTS_TABLE = `${site.dbPrefix}team_comments`;
-export const MAX_TEAM_SIZE = 6;
+/** 한 팀 정원: 4명 (기술 2 + 인문 2) */
+export const MAX_TEAM_SIZE = 4;
+/** 트랙 종류와 트랙별 정원 */
+export const TRACKS = ['기술', '인문'] as const;
+export const TRACK_CAP = 2;
+/** 특정 트랙의 현재 인원 */
+export const trackCount = (list: TeamMember[], track: string): number =>
+  list.filter((m) => m.track === track).length;
 
 /** 글 카테고리 */
 export type PostCategory = 'note' | 'idea' | 'resource' | 'etc';
@@ -75,6 +82,10 @@ export async function joinTeam(team: Team, member: TeamMember): Promise<{ ok: bo
   const list = members(team);
   if (list.some((m) => m.id === member.id)) return { ok: true };
   if (list.length >= MAX_TEAM_SIZE) return { ok: false, error: 'full' };
+  // 트랙 정원(각 2명) 초과 방지
+  if (member.track && trackCount(list, member.track) >= TRACK_CAP) {
+    return { ok: false, error: `track-full:${member.track}` };
+  }
   const { error } = await client.from(TEAMS_TABLE).update({ members: [...list, member] }).eq('id', team.id);
   return error ? { ok: false, error: error.message } : { ok: true };
 }
