@@ -37,25 +37,12 @@ const Resources = (): ReactElement => {
 
   return (
     <>
-      <SEOHead title="학습자료" description="드림아이티비즈 학습 사이트와 외부 AI·개발 자료를 분야별로 모았습니다." path="/resources" />
+      <SEOHead title="학습자료" description="ESG·환경 데이터 캡스톤 교과목에 맞춘 공공데이터·분석도구·생성형 AI 등 외부 추천 자료를 분야별로 모았습니다." path="/resources" />
 
       <section className="page-header">
         <div className="container">
           <h2>학습자료</h2>
-          <p>DreamIT 사에서 만든 학습 사이트와 외부 자료·도구를 분야별로 모았습니다.</p>
-          <a
-            href="https://padlet.com/aebon/rest01"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '14px',
-              padding: '10px 18px', borderRadius: '999px', textDecoration: 'none',
-              fontSize: '14px', fontWeight: 700, color: '#fff', background: 'var(--primary-blue, #0046C8)',
-              boxShadow: '0 4px 14px rgba(0,70,200,0.25)',
-            }}
-          >
-            📌 학습기간 참고사이트 — ReBoot 1기 ↗
-          </a>
+          <p>ESG·환경 문제를 데이터·생성형 AI로 해결하는 데 도움이 되는 외부 자료·도구를 분야별로 모았습니다.</p>
         </div>
       </section>
 
@@ -69,7 +56,7 @@ const Resources = (): ReactElement => {
                 <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-secondary)' }}> · {group.sites.length}개</span>
               </h3>
               <p style={{ margin: '0 0 18px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                {group.owner === 'mine' ? '드림아이티비즈가 운영하는 학습 사이트입니다.' : '제3자가 제공하는 외부 사이트·도구입니다.'}
+                {group.owner === 'mine' ? '드림아이티비즈가 운영하는 학습 사이트입니다.' : '제3자가 제공하는 외부 사이트·도구입니다. 링크는 새 탭에서 열립니다.'}
               </p>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '12px' }}>
@@ -115,11 +102,15 @@ const Resources = (): ReactElement => {
                 background: 'var(--bg-white)', border: '1px solid var(--border-light)',
                 borderRadius: '12px', padding: '14px 10px',
               }}>
-                {sectionLabel('DreamIT 사에서 만든 사이트')}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginBottom: '14px' }}>
-                  {mine.map(navBtn)}
-                </div>
-                {sectionLabel('외부 사이트')}
+                {mine.length > 0 && (
+                  <>
+                    {sectionLabel('DreamIT 사에서 만든 사이트')}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginBottom: '14px' }}>
+                      {mine.map(navBtn)}
+                    </div>
+                  </>
+                )}
+                {sectionLabel('분야별 외부 자료')}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                   {external.map(navBtn)}
                 </div>
