@@ -88,13 +88,24 @@ const PblEval = (): ReactElement => {
               <>
                 <div className="pgd-hero-card" style={{ borderLeftColor: '#0046C8' }}>
                   <span className="pgd-hero-icon" style={{ background: '#0046C818', color: '#0046C8' }}>🎓</span>
-                  <div>
-                    <h3 className="pgd-hero-title">{sel.student_name || '(이름없음)'}</h3>
-                    <p className="pgd-hero-subtitle">
+                  <div style={{ minWidth: 0 }}>
+                    <h3 className="pgd-hero-title" style={{ marginBottom: '6px' }}>{sel.student_name || '(이름없음)'}</h3>
+                    {/* 1줄: 개인정보 */}
+                    <p className="pgd-hero-subtitle" style={{ margin: '0 0 8px' }}>
                       {sel.student_no || '-'} · {sel.major || '-'} · {sel.phone || '-'} · {sel.track || '-'} 트랙
-                      {sel.topic_key && getTopic(sel.topic_key) && <> · {getTopic(sel.topic_key)!.title}</>}
-                      {' · '}🤖 자동 <strong>{autoTotal(sel.auto)}</strong> · 👩‍🏫 강사 <strong>{totalScore(sel.scores)}</strong> / {PBL_TOTAL}점
                     </p>
+                    {/* 2줄: 주제 + 점수 */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', fontSize: '13px' }}>
+                      {sel.topic_key && getTopic(sel.topic_key) && (
+                        <span style={{ color: 'var(--text-secondary)' }}>📌 {getTopic(sel.topic_key)!.title}</span>
+                      )}
+                      <span style={{ fontWeight: 700, padding: '3px 12px', borderRadius: '999px', background: '#eff6ff', color: '#1e40af' }}>
+                        🤖 자동 {autoTotal(sel.auto)} / {PBL_TOTAL}
+                      </span>
+                      <span style={{ fontWeight: 700, padding: '3px 12px', borderRadius: '999px', background: '#fef3c7', color: '#92400e' }}>
+                        👩‍🏫 강사 {totalScore(sel.scores)} / {PBL_TOTAL}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
