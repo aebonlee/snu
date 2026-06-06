@@ -16,13 +16,13 @@ export interface PblInfo {
   college: string;
   department: string;
   major: string;
-  course_type: string;
-  major_type: string;
   roster_matched: boolean;
   phone: string;
   region: string;
   topic_key: string;
   track: string;
+  course_type?: string;
+  major_type?: string;
 }
 
 export interface PblSubmission {

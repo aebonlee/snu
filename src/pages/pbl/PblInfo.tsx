@@ -6,7 +6,7 @@ import { updateProfile } from '../../utils/auth';
 import { REGIONS, topicsByRegion, type Region } from '../../data/projectTopics';
 import { TRACKS } from '../../utils/projectTeams';
 import {
-  COLLEGES, COURSE_TYPES, MAJOR_TYPES, departmentsOf, majorsOf, matchRoster, COURSE_TITLE,
+  COLLEGES, departmentsOf, majorsOf, matchRoster, COURSE_TITLE,
 } from '../../data/rosterData';
 import { PBL_STAGES, PBL_TOTAL, autoTotal, autoStagePoints } from '../../config/pblActivity';
 import { getMySubmission, saveInfo, type PblSubmission } from '../../utils/pblStore';
@@ -23,8 +23,7 @@ const PblInfo = (): ReactElement => {
   const { user, profile, refreshProfile } = useAuth() as any;
   const { showToast } = useToast();
   const [form, setForm] = useState({
-    student_name: '', student_no: '', college: '', department: '', major: '',
-    course_type: '', major_type: '', phone: '',
+    student_name: '', student_no: '', college: '', department: '', major: '', phone: '',
     region: '서울' as Region, topic_key: '', track: '기술',
   });
   const [saving, setSaving] = useState(false);
@@ -43,8 +42,6 @@ const PblInfo = (): ReactElement => {
       college: row?.college || profile?.college || '',
       department: row?.department || profile?.department || '',
       major: row?.major || profile?.major || '',
-      course_type: row?.course_type || '',
-      major_type: row?.major_type || '',
       phone: row?.phone || profile?.phone || '',
       region: (row?.region as Region) || '서울',
       topic_key: row?.topic_key || '',
@@ -133,7 +130,10 @@ const PblInfo = (): ReactElement => {
                 </div>
               </div>
 
-              {/* 소속 (명단 대조) */}
+              {/* 소속·트랙 4가지 확인 (명단 대조) */}
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary-blue)' }}>
+                소속·트랙 확인 — 대학(원) · 학과(부) · 전공 · 트랙 (수강 명단과 대조)
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>대학(원) *</label>
@@ -157,21 +157,7 @@ const PblInfo = (): ReactElement => {
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>교과구분</label>
-                  <select style={input} value={form.course_type} onChange={(e) => setForm({ ...form, course_type: e.target.value })}>
-                    <option value="">— 선택 —</option>
-                    {COURSE_TYPES.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>전공구분</label>
-                  <select style={input} value={form.major_type} onChange={(e) => setForm({ ...form, major_type: e.target.value })}>
-                    <option value="">해당없음</option>
-                    {MAJOR_TYPES.filter(Boolean).map((m) => <option key={m} value={m}>{m}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>트랙</label>
+                  <label style={labelStyle}>트랙 *</label>
                   <select style={input} value={form.track} onChange={(e) => setForm({ ...form, track: e.target.value })}>
                     {TRACKS.map((t) => <option key={t} value={t}>{t} 트랙</option>)}
                   </select>
