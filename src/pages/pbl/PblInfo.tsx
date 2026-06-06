@@ -203,9 +203,9 @@ const PblInfo = (): ReactElement => {
                       const t = sub?.scores?.[s.key];
                       const pts = typeof a === 'number' ? autoStagePoints(a, s.max) : 0;
                       return (
-                        <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ flex: '0 0 230px', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.icon} {i + 1}. {s.label}</span>
-                          <div style={{ flex: '0 0 180px', height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
+                        <div key={s.key} className="pbl-score-row">
+                          <span className="pbl-score-label" style={{ fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.icon} {i + 1}. {s.label}</span>
+                          <div className="pbl-score-bar" style={{ height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
                             <div style={{ width: `${(pts / s.max) * 100}%`, height: '100%', background: s.color, transition: 'width .3s' }} />
                           </div>
                           <span style={{ flex: '0 0 auto', fontSize: '12.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
