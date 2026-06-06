@@ -56,7 +56,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '지역문제 해결형 프로젝트의 관점 정리',
       '학생 관심 도메인 1차 선택',
     ],
-    instructor: '정동엽', mode: 'tbd',
+    instructor: '정동엽', mode: 'offline',
   },
   {
     no: 3, date: '2026-06-29', weekday: '월', time: COURSE_TIME,
@@ -67,7 +67,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '인문 트랙: 맥락 정보, 이해관계자, 사용자 관점 정리',
       '팀별 데이터 후보 정리',
     ],
-    instructor: '정동엽', mode: 'tbd',
+    instructor: '정동엽', mode: 'online',
   },
   {
     no: 4, date: '2026-07-01', weekday: '수', time: COURSE_TIME,
@@ -78,7 +78,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '“왜 중요한 문제인가” 정리',
       '사례연구 템플릿 작성',
     ],
-    instructor: '정동엽', mode: 'tbd',
+    instructor: '정동엽', mode: 'online',
   },
   {
     no: 5, date: '2026-07-03', weekday: '금', time: COURSE_TIME,
@@ -88,7 +88,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '인문 트랙: 사용자 분석·이해관계자 분석·스토리라인 설계',
       '팀별 역할 분담 확정',
     ],
-    instructor: '정동엽', mode: 'tbd',
+    instructor: '김현주', mode: 'online',
   },
   {
     no: 6, date: '2026-07-06', weekday: '월', time: COURSE_TIME,
@@ -98,7 +98,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '인문 트랙: 정책·관광·문화·생태 관점의 해결안 구성',
       '중간발표 자료 초안 작성',
     ],
-    instructor: '김현주', mode: 'tbd',
+    instructor: '김현주', mode: 'online',
   },
   {
     no: 7, date: '2026-07-08', weekday: '수', time: COURSE_TIME,
@@ -110,7 +110,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '해커톤 확장 가능성 검토',
       '피드백 제공',
     ],
-    instructor: '김현주', mode: 'tbd',
+    instructor: '김현주', mode: 'offline',
   },
   {
     no: 8, date: '2026-07-10', weekday: '금', time: COURSE_TIME,
@@ -131,7 +131,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '인문 트랙: 현장 맥락 조사, 서비스·콘텐츠 기획안 정리',
       '지역 맞춤형 해결 방향 고도화',
     ],
-    instructor: '이애본', mode: 'tbd',
+    instructor: '이애본', mode: 'offline',
   },
   {
     no: 10, date: '2026-07-15', weekday: '수', time: COURSE_TIME,
@@ -141,7 +141,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '인문 트랙: 서비스 흐름, 사용자 경험, 정책 제안, 콘텐츠 구성',
       '발표용 핵심 메시지 정리',
     ],
-    instructor: '이애본', mode: 'tbd',
+    instructor: '이애본', mode: 'online',
   },
   {
     no: 11, date: '2026-07-20', weekday: '월', time: COURSE_TIME,
@@ -152,7 +152,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '발표자료 구조화',
       '해커톤형 피치 문장 정제',
     ],
-    instructor: '이애본', mode: 'tbd',
+    instructor: '이애본', mode: 'online',
   },
   {
     no: 12, date: '2026-07-22', weekday: '수', time: COURSE_TIME,
@@ -163,7 +163,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '지역 적용 가능성 검토',
       '피드백 기반 수정',
     ],
-    instructor: '이애본', mode: 'tbd',
+    instructor: '이애본', mode: 'offline',
   },
   {
     no: 13, date: '2026-07-24', weekday: '금', time: COURSE_TIME,
@@ -174,7 +174,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '3분 피치덱 및 발표 스크립트 작성',
       '해커톤 제출형 결과물 형태로 정리',
     ],
-    instructor: '이애본', mode: 'tbd',
+    instructor: '이애본', mode: 'offline',
   },
   {
     no: 14, date: '2026-07-27', weekday: '월', time: COURSE_TIME,
@@ -185,7 +185,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '심사기준 기반 피드백',
       '비교과 및 해커톤 연계 가능팀 선별',
     ],
-    instructor: '이애본', mode: 'tbd',
+    instructor: '이애본', mode: 'online',
   },
   {
     no: 15, date: '2026-07-29', weekday: '수', time: COURSE_TIME,
@@ -200,10 +200,27 @@ export const SNU_SESSIONS: SnuSession[] = [
   },
 ];
 
-/** 오프라인 고정 회차(OT·중간·기말)를 제외한, 비대면 전환 가능 회차 (최대 7회차) */
-export const ONLINE_ELIGIBLE_NOS = SNU_SESSIONS
-  .filter((s) => s.mode !== 'offline-fixed')
+/** 비대면(온라인) 진행 회차 — 3·4·5·6·10·11·14 (총 7회차) */
+export const ONLINE_SESSION_NOS = SNU_SESSIONS
+  .filter((s) => s.mode === 'online')
   .map((s) => s.no);
 
-/** 담당 강사별 회차 묶음 */
+/** 오프라인 고정 회차 — OT(1)·중간(8)·기말(15) */
+export const OFFLINE_FIXED_NOS = SNU_SESSIONS
+  .filter((s) => s.mode === 'offline-fixed')
+  .map((s) => s.no);
+
+/** 교육방식 한글 라벨 */
+export const MODE_LABEL: Record<DeliveryMode, string> = {
+  'offline-fixed': '오프라인(고정)',
+  offline: '오프라인',
+  online: '온라인',
+  tbd: '미정',
+};
+
+/** 담당 강사 목록 */
 export const INSTRUCTORS = ['이애본', '정동엽', '김현주'] as const;
+
+/** 강사별 담당 회차 */
+export const sessionsByInstructor = (name: string): SnuSession[] =>
+  SNU_SESSIONS.filter((s) => s.instructor === name);

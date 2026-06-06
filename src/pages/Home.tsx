@@ -1,13 +1,40 @@
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
 import SEOHead from '../components/SEOHead';
 import site from '../config/site';
-import { coursePhases, projectExamples } from '../config/curriculum';
+import {
+  SNU_SESSIONS,
+  ONLINE_SESSION_NOS,
+  OFFLINE_FIXED_NOS,
+} from '../config/snuSchedule';
 import type { ReactElement } from 'react';
 
-const Home = (): ReactElement => {
-  const { t } = useLanguage();
+const offlineCount = SNU_SESSIONS.length - ONLINE_SESSION_NOS.length;
 
+const tracks = [
+  {
+    icon: '🛠️',
+    color: '#0046C8',
+    title: '기술 트랙',
+    desc: '공공·지역 데이터 탐색부터 분석·시각화, 프로토타입·대시보드·지도·추천 구조 설계까지 데이터 기반 해결안을 구현합니다.',
+    points: ['데이터 수집·정제·EDA', '시각화·대시보드', '프로토타입 설계'],
+  },
+  {
+    icon: '📖',
+    color: '#00855A',
+    title: '인문 트랙',
+    desc: '사용자·이해관계자 분석과 맥락 조사를 통해 정책·관광·문화·생태 관점의 서비스·콘텐츠 해결안을 기획합니다.',
+    points: ['사용자·이해관계자 분석', '스토리라인·서비스 흐름', '정책·콘텐츠 기획'],
+  },
+];
+
+const phases = [
+  { n: 1, color: '#10B981', title: '문제정의 (1~5회차)', desc: '지역 이해 · 데이터 탐색 · 생성형 AI 기반 문제정의 · 트랙별 방법론' },
+  { n: 2, color: '#3B82F6', title: '중간 설계 (6~8회차)', desc: '중간 설계 발표 · 피드백 · 주제·데이터·역할 확정' },
+  { n: 3, color: '#6B21A8', title: '프로젝트 실행 (9~13회차)', desc: '데이터 분석·구현 · 생성형 AI 고도화 · 결과 통합·고도화' },
+  { n: 4, color: '#0D2B5E', title: '해커톤 연계 (14~15회차)', desc: '모의 해커톤 발표 · 최종 발표 · 제주국제 생태포럼 해커톤 후속 연계' },
+];
+
+const Home = (): ReactElement => {
   return (
     <>
       <SEOHead title={`${site.name} | ${site.nameKo}`} description={site.description} />
@@ -18,12 +45,12 @@ const Home = (): ReactElement => {
           <div className="particles">
             {Array.from({ length: 20 }, (_, i) => (
               <div key={i} className="particle" style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${3 + Math.random() * 6}px`,
-                height: `${3 + Math.random() * 6}px`,
-                animationDelay: `${Math.random() * 20}s`,
-                animationDuration: `${15 + Math.random() * 10}s`,
+                left: `${(i * 53) % 100}%`,
+                top: `${(i * 37) % 100}%`,
+                width: `${3 + (i % 6)}px`,
+                height: `${3 + (i % 6)}px`,
+                animationDelay: `${(i * 1.1) % 20}s`,
+                animationDuration: `${15 + (i % 10)}s`,
               }} />
             ))}
           </div>
@@ -31,142 +58,98 @@ const Home = (): ReactElement => {
         <div className="container">
           <div className="hero-content">
             <h1 className="hero-title">
-              <span className="title-line">{t('site.home.title')}</span>
-              <span className="title-line"><span className="highlight">{t('site.home.subtitle')}</span></span>
+              <span className="title-line">서울대학교 하계 계절학기</span>
+              <span className="title-line"><span className="highlight">PBL · 지역문제 해결 프로젝트</span></span>
             </h1>
-            <p className="hero-description">{t('site.home.description')}</p>
+            <p className="hero-description">
+              교과 · 비교과 · 제주국제 생태포럼 해커톤을 연계하여, 기술 트랙과 인문 트랙으로
+              지역문제 해결형 프로젝트를 수행합니다.
+            </p>
             <div className="hero-info-cards">
               <div className="hero-info-card">
                 <span className="hero-info-icon">📅</span>
-                <div><strong>교육 기간</strong><br/>2026.6.1 ~ 6.22</div>
+                <div><strong>교육 기간</strong><br/>2026.6.24 ~ 7.29</div>
               </div>
               <div className="hero-info-card">
                 <span className="hero-info-icon">⏱️</span>
-                <div><strong>총 교육시간</strong><br/>80H (선수20H+정규52H+코칭8H)</div>
+                <div><strong>운영 회차</strong><br/>총 {SNU_SESSIONS.length}회차 · 10:00~12:50</div>
               </div>
               <div className="hero-info-card">
                 <span className="hero-info-icon">💻</span>
-                <div><strong>교육 방식</strong><br/>오프라인 집중 교육</div>
+                <div><strong>교육 방식</strong><br/>오프라인 {offlineCount} · 온라인 {ONLINE_SESSION_NOS.length}회차</div>
               </div>
               <div className="hero-info-card">
                 <span className="hero-info-icon">🏆</span>
-                <div><strong>목표</strong><br/>AI 리부트 경진대회 출품</div>
+                <div><strong>목표</strong><br/>제주국제 생태포럼 해커톤 연계</div>
               </div>
             </div>
             <div className="hero-buttons">
-              <Link to="/curriculum" className="btn btn-primary">{t('site.home.viewCurriculum')}</Link>
-              <Link to="/classroom" className="btn btn-secondary">{t('site.nav.classroom')}</Link>
+              <Link to="/schedule" className="btn btn-primary">강의 일정 보기</Link>
+              <Link to="/instructor" className="btn btn-secondary">담당 강사</Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 과정 개요 */}
+      {/* 트랙 운영 구조 */}
       <section className="section">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">{t('site.home.courseOverview')}</h2>
-            <p className="section-subtitle">{t('site.home.courseOverviewDesc')}</p>
+            <h2 className="section-title">두 개의 트랙으로 함께 달립니다</h2>
+            <p className="section-subtitle">학생의 관심 도메인에 따라 기술 트랙 / 인문 트랙으로 역할을 분담해 협업합니다.</p>
           </div>
           <div className="course-cards">
-            {coursePhases.map((phase) => (
-              <div key={phase.id} className="course-card" style={{ borderTopColor: phase.color }}>
-                <div className="course-card-icon">{phase.icon}</div>
-                <h3 className="course-card-title">{phase.name}</h3>
-                <p className="course-card-hours">{phase.hours}시간</p>
-                <p className="course-card-desc">{phase.description}</p>
-                <div className="course-card-days">{phase.days.length}일 과정</div>
+            {tracks.map((tr) => (
+              <div key={tr.title} className="course-card" style={{ borderTopColor: tr.color }}>
+                <div className="course-card-icon">{tr.icon}</div>
+                <h3 className="course-card-title">{tr.title}</h3>
+                <p className="course-card-desc">{tr.desc}</p>
+                <div className="course-card-days">{tr.points.join(' · ')}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 프로젝트 산출물 */}
+      {/* 프로젝트 진행 단계 */}
       <section className="section section-alt">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">{t('site.home.projectOutputs')}</h2>
-            <p className="section-subtitle">{t('site.home.projectOutputsDesc')}</p>
+            <h2 className="section-title">프로젝트 진행 단계</h2>
+            <p className="section-subtitle">문제정의 → 중간설계 → 실행 → 해커톤 연계의 흐름으로 산출물을 완성합니다.</p>
           </div>
           <div className="project-timeline">
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#10B981' }}>1</div>
-              <div className="timeline-content">
-                <h4>개인 미니프로젝트</h4>
-                <p>1~3일차 | AI 자동화 도구를 활용한 개인 프로젝트</p>
-              </div>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#3B82F6' }}>2</div>
-              <div className="timeline-content">
-                <h4>팀 미니프로젝트</h4>
-                <p>4~5일차 | 바이브코딩 기반 팀 협업 프로젝트</p>
-              </div>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-marker" style={{ background: '#0D2B5E' }}>3</div>
-              <div className="timeline-content">
-                <h4>실전 프로젝트</h4>
-                <p>6~13일차 | AI 리부트 경진대회 출품작 개발</p>
-              </div>
-            </div>
-          </div>
-          <div className="project-examples">
-            <h3>프로젝트 예시</h3>
-            <div className="example-cards">
-              {projectExamples.map((ex, i) => (
-                <div key={i} className="example-card">
-                  <h4>{ex.title}</h4>
-                  <p>{ex.description}</p>
-                  <span className="example-llm">LLM: {ex.llm}</span>
+            {phases.map((p) => (
+              <div key={p.n} className="timeline-item">
+                <div className="timeline-marker" style={{ background: p.color }}>{p.n}</div>
+                <div className="timeline-content">
+                  <h4>{p.title}</h4>
+                  <p>{p.desc}</p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* AI 리부트 대회 */}
+      {/* 운영 특이사항 */}
       <section className="section">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">{t('site.home.competition')}</h2>
-            <p className="section-subtitle">{t('site.home.competitionDesc')}</p>
-          </div>
-          <div className="competition-highlight">
-            <div className="competition-card">
-              <h3>AI 리부트 경진대회</h3>
-              <p>국내 LLM(Solar 등)을 활용한 서비스 개발 경진대회에 출품합니다.</p>
-              <ul>
-                <li>국내 LLM 활용 가산점</li>
-                <li>Claude 유료 플랜 1개월 제공(6월 한달)</li>
-                <li>국내 LLM API 비용 지원</li>
-              </ul>
-              <Link to="/competition" className="btn btn-primary">대회 상세 보기</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 특이사항 */}
-      <section className="section section-alt">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">{t('site.home.eligibility')}</h2>
+            <h2 className="section-title">운영 안내</h2>
           </div>
           <div className="eligibility-cards">
             <div className="eligibility-card">
-              <h4>교육 대상</h4>
-              <p>고용보험 미가입, 아르바이트/계약직에 비참여 중인 청년</p>
+              <h4>연계 구조</h4>
+              <p>교과 · 비교과 · 제주국제 생태포럼 해커톤을 하나의 흐름으로 연계해 운영합니다.</p>
             </div>
             <div className="eligibility-card">
-              <h4>AI 도구 지원</h4>
-              <p>Claude 유료 플랜 1개월 제공(6월 한달) + 국내 LLM API 비용 지원</p>
+              <h4>교육 방식</h4>
+              <p>OT·중간·기말({OFFLINE_FIXED_NOS.join('·')}회차)은 오프라인 고정, 그 외 최대 {ONLINE_SESSION_NOS.length}회차 비대면(온라인) 진행.</p>
             </div>
             <div className="eligibility-card">
-              <h4>수료 후 혜택</h4>
-              <p>AI 리부트 경진대회 출품 + 포트폴리오 완성</p>
+              <h4>최종 산출물</h4>
+              <p>결과보고서 · 핵심 데이터 시각화 · 3분 피치덱 등 해커톤 제출형 결과물로 정리합니다.</p>
             </div>
           </div>
         </div>
