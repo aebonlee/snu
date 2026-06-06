@@ -16,6 +16,7 @@ export interface ExamResultRow {
   correct: number;
   total: number;
   passed: boolean;
+  attempts: number;
   answers: any;
   submitted_at?: string;
 }
@@ -26,6 +27,7 @@ export interface SaveResultInput {
   correct: number;
   total: number;
   passed: boolean;
+  attempts: number;
   answers: any;
   studentName?: string;
 }
@@ -42,6 +44,7 @@ export async function saveResult(user: AuthUser, input: SaveResultInput): Promis
     correct: input.correct,
     total: input.total,
     passed: input.passed,
+    attempts: input.attempts,
     answers: input.answers,
     submitted_at: new Date().toISOString(),
   };

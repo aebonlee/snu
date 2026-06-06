@@ -194,7 +194,7 @@ export const translations: Record<string, Record<string, unknown>> = {
         projectApps: '프로젝트 구현 예시',
         exam: '평가',
         examPre: '사전평가 (준비도 확인)',
-        examDiag: '진단평가 (수업 중 점검)',
+        examDiag: '진단평가 (자습·미반영)',
         examPost: '사후평가 (최종 성취도)',
         pbl: '개인별 PBL활동',
         pblInfo: '기본정보',
