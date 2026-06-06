@@ -13,7 +13,12 @@ export const PBL_TABLE = `${site.dbPrefix}pbl_submissions`;
 export interface PblInfo {
   student_name: string;
   student_no: string;
+  college: string;
+  department: string;
   major: string;
+  course_type: string;
+  major_type: string;
+  roster_matched: boolean;
   phone: string;
   region: string;
   topic_key: string;
@@ -25,7 +30,12 @@ export interface PblSubmission {
   email: string;
   student_name: string;
   student_no: string;
+  college?: string;
+  department?: string;
   major: string;
+  course_type?: string;
+  major_type?: string;
+  roster_matched?: boolean;
   phone: string;
   team_name: string;
   region: string;
@@ -51,7 +61,7 @@ export async function getMySubmission(user: AuthUser): Promise<PblSubmission | n
 export async function saveInfo(user: AuthUser, info: PblInfo): Promise<void> {
   const client = getSupabase();
   if (!client || !user) throw new Error('로그인이 필요합니다.');
-  const row = {
+  const core = {
     user_id: user.id,
     email: user.email || '',
     student_name: info.student_name || '',
@@ -63,7 +73,20 @@ export async function saveInfo(user: AuthUser, info: PblInfo): Promise<void> {
     track: info.track || '',
     updated_at: new Date().toISOString(),
   };
-  const { error } = await client.from(PBL_TABLE).upsert(row, { onConflict: 'user_id' });
+  const full = {
+    ...core,
+    college: info.college || '',
+    department: info.department || '',
+    course_type: info.course_type || '',
+    major_type: info.major_type || '',
+    roster_matched: !!info.roster_matched,
+  };
+  // 신규 컬럼(college 등)이 아직 없으면 핵심 정보만 저장(폴백)
+  let { error } = await client.from(PBL_TABLE).upsert(full, { onConflict: 'user_id' });
+  if (error) {
+    const res = await client.from(PBL_TABLE).upsert(core, { onConflict: 'user_id' });
+    error = res.error;
+  }
   if (error) throw error;
 }
 

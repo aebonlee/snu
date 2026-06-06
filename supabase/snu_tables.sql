@@ -536,3 +536,15 @@ ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS phone TEXT DEFAULT '';
 -- 공유 회원 테이블(user_profiles)에 학번·전공 추가 (additive, 다른 사이트 무영향)
 ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS student_no TEXT;
 ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS major TEXT;
+
+-- 명단 대조용 소속 컬럼 (PBL 기본정보 + 공유 회원)
+ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS college TEXT DEFAULT '';
+ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS department TEXT DEFAULT '';
+ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS course_type TEXT DEFAULT '';
+ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS major_type TEXT DEFAULT '';
+ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS roster_matched BOOLEAN DEFAULT false;
+ALTER TABLE snu_assessments ADD COLUMN IF NOT EXISTS attempts INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE snu_assessments DROP CONSTRAINT IF EXISTS snu_assessments_type_check;
+ALTER TABLE snu_assessments ADD CONSTRAINT snu_assessments_type_check CHECK (type IN ('prerequisite','diagnostic','summative'));
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS college TEXT;
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS department TEXT;

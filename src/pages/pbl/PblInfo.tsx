@@ -5,6 +5,9 @@ import SEOHead from '../../components/SEOHead';
 import { updateProfile } from '../../utils/auth';
 import { REGIONS, topicsByRegion, type Region } from '../../data/projectTopics';
 import { TRACKS } from '../../utils/projectTeams';
+import {
+  COLLEGES, COURSE_TYPES, MAJOR_TYPES, departmentsOf, majorsOf, matchRoster, COURSE_TITLE,
+} from '../../data/rosterData';
 import { PBL_STAGES, PBL_TOTAL, autoTotal, autoStagePoints } from '../../config/pblActivity';
 import { getMySubmission, saveInfo, type PblSubmission } from '../../utils/pblStore';
 import PblSidebar from './PblSidebar';
@@ -20,7 +23,8 @@ const PblInfo = (): ReactElement => {
   const { user, profile, refreshProfile } = useAuth() as any;
   const { showToast } = useToast();
   const [form, setForm] = useState({
-    student_name: '', student_no: '', major: '', phone: '',
+    student_name: '', student_no: '', college: '', department: '', major: '',
+    course_type: '', major_type: '', phone: '',
     region: '서울' as Region, topic_key: '', track: '기술',
   });
   const [saving, setSaving] = useState(false);
@@ -28,6 +32,7 @@ const PblInfo = (): ReactElement => {
   const [sub, setSub] = useState<PblSubmission | null>(null);
 
   const email = profile?.email || user?.email || '';
+  const matched = matchRoster(form.college, form.department, form.major);
 
   const load = useCallback(async () => {
     const row = await getMySubmission(user);
@@ -35,7 +40,11 @@ const PblInfo = (): ReactElement => {
     setForm({
       student_name: row?.student_name || profile?.name || profile?.display_name || '',
       student_no: row?.student_no || profile?.student_no || '',
+      college: row?.college || profile?.college || '',
+      department: row?.department || profile?.department || '',
       major: row?.major || profile?.major || '',
+      course_type: row?.course_type || '',
+      major_type: row?.major_type || '',
       phone: row?.phone || profile?.phone || '',
       region: (row?.region as Region) || '서울',
       topic_key: row?.topic_key || '',
@@ -47,21 +56,25 @@ const PblInfo = (): ReactElement => {
   useEffect(() => { load(); }, [load]);
 
   const topics = topicsByRegion(form.region);
+  const departments = form.college ? departmentsOf(form.college) : [];
+  const majors = form.college && form.department ? majorsOf(form.college, form.department) : [];
 
   const handleSave = async () => {
     if (!form.student_name.trim()) { showToast('이름을 입력해 주세요.', 'warning'); return; }
     if (!form.student_no.trim()) { showToast('학번을 입력해 주세요.', 'warning'); return; }
+    if (!form.college || !form.department) { showToast('대학(원)·학과(부)를 선택해 주세요.', 'warning'); return; }
     setSaving(true);
     try {
-      await saveInfo(user, form);
+      await saveInfo(user, { ...form, roster_matched: matched });
       try {
         await updateProfile(user.id, {
           name: form.student_name, display_name: form.student_name,
-          phone: form.phone, student_no: form.student_no, major: form.major,
+          phone: form.phone, student_no: form.student_no,
+          college: form.college, department: form.department, major: form.major,
         });
         if (refreshProfile) await refreshProfile();
       } catch { /* 프로필 반영 실패 무시 */ }
-      showToast('기본정보를 저장하고 회원정보에 반영했습니다.', 'success');
+      showToast(matched ? '저장 완료 — 명단 확인됨 ✓' : '저장했습니다. (명단에서 확인되지 않음)', matched ? 'success' : 'warning');
       load();
     } catch (e: any) {
       showToast('저장 실패: ' + (e?.message || ''), 'error');
@@ -76,7 +89,7 @@ const PblInfo = (): ReactElement => {
           <h2>개인별 PBL활동 · 기본정보</h2>
           <p>
             나의 정보를 입력하고 단계별 활동을 진행합니다.<br />
-            작성 내용은 자동 평가되어 점수로 저장되며, 반복해 다듬을수록 실력이 향상됩니다.
+            소속(대학·학과·전공)으로 수강 명단과 대조하며, 작성 내용은 자동 평가되어 점수로 저장됩니다.
           </p>
         </div>
       </section>
@@ -89,9 +102,18 @@ const PblInfo = (): ReactElement => {
             <div style={{ textAlign: 'center', padding: '40px' }}><div className="loading-spinner" style={{ margin: '0 auto' }} /></div>
           ) : (
             <>
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'var(--bg-light-gray)', borderRadius: '8px', padding: '10px 14px' }}>
-                입력한 이름·학번·전공·연락처는 <strong>회원정보에도 함께 저장</strong>됩니다.
+              {/* 명단 대조 상태 */}
+              <div style={{
+                fontSize: '13.5px', borderRadius: '10px', padding: '12px 16px', fontWeight: 600,
+                background: !form.college ? 'var(--bg-light-gray)' : matched ? '#d1fae5' : '#fee2e2',
+                color: !form.college ? 'var(--text-secondary)' : matched ? '#065f46' : '#991b1b',
+              }}>
+                {!form.college ? `📋 소속을 선택하면 「${COURSE_TITLE}」 수강 명단과 대조합니다.`
+                  : matched ? '✓ 수강 명단에서 확인된 소속입니다.'
+                  : '⚠ 선택한 소속이 수강 명단과 일치하지 않습니다. 대학·학과를 다시 확인하세요.'}
               </div>
+
+              {/* 개인정보 */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>이름 *</label>
@@ -102,16 +124,51 @@ const PblInfo = (): ReactElement => {
                   <input style={input} value={form.student_no} onChange={(e) => setForm({ ...form, student_no: e.target.value })} placeholder="예) 2026-12345" />
                 </div>
                 <div>
-                  <label style={labelStyle}>전공</label>
-                  <input style={input} value={form.major} onChange={(e) => setForm({ ...form, major: e.target.value })} placeholder="예) 컴퓨터공학부 / 인류학과" />
-                </div>
-                <div>
                   <label style={labelStyle}>연락처</label>
                   <input style={input} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="010-0000-0000" />
                 </div>
                 <div>
-                  <label style={labelStyle}>이메일 (회원 가입 계정)</label>
+                  <label style={labelStyle}>이메일 (회원 계정)</label>
                   <input style={{ ...input, background: 'var(--bg-light-gray)', color: 'var(--text-secondary)' }} value={email} readOnly />
+                </div>
+              </div>
+
+              {/* 소속 (명단 대조) */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>대학(원) *</label>
+                  <select style={input} value={form.college} onChange={(e) => setForm({ ...form, college: e.target.value, department: '', major: '' })}>
+                    <option value="">— 선택 —</option>
+                    {COLLEGES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>학과(부) *</label>
+                  <select style={input} value={form.department} disabled={!form.college} onChange={(e) => setForm({ ...form, department: e.target.value, major: '' })}>
+                    <option value="">— 선택 —</option>
+                    {departments.map((d) => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>전공</label>
+                  <select style={input} value={form.major} disabled={!form.department} onChange={(e) => setForm({ ...form, major: e.target.value })}>
+                    <option value="">— 선택/해당없음 —</option>
+                    {majors.map((m) => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>교과구분</label>
+                  <select style={input} value={form.course_type} onChange={(e) => setForm({ ...form, course_type: e.target.value })}>
+                    <option value="">— 선택 —</option>
+                    {COURSE_TYPES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>전공구분</label>
+                  <select style={input} value={form.major_type} onChange={(e) => setForm({ ...form, major_type: e.target.value })}>
+                    <option value="">해당없음</option>
+                    {MAJOR_TYPES.filter(Boolean).map((m) => <option key={m} value={m}>{m}</option>)}
+                  </select>
                 </div>
                 <div>
                   <label style={labelStyle}>트랙</label>
@@ -121,6 +178,7 @@ const PblInfo = (): ReactElement => {
                 </div>
               </div>
 
+              {/* 관심 주제 */}
               <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '12px' }}>
                 <div>
                   <label style={labelStyle}>관심 지역</label>
@@ -138,10 +196,10 @@ const PblInfo = (): ReactElement => {
               </div>
 
               <button className="btn btn-primary" style={{ alignSelf: 'flex-start', padding: '11px 26px' }} disabled={saving} onClick={handleSave}>
-                {saving ? '저장 중…' : '기본정보 저장 (회원정보 반영)'}
+                {saving ? '저장 중…' : '기본정보 저장 (명단 대조·회원정보 반영)'}
               </button>
 
-              {/* 내 자동 평가 점수 — 항목별 */}
+              {/* 내 점수 요약 — 항목별 */}
               <div style={{ marginTop: '8px', padding: '20px 22px', borderRadius: '14px', border: '1px solid var(--border-light)', background: 'var(--bg-white)' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap', marginBottom: '14px' }}>
                   <span style={{ fontSize: '15px', fontWeight: 800 }}>🤖 내 평가 점수</span>
@@ -151,7 +209,6 @@ const PblInfo = (): ReactElement => {
                   <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>각 단계에서 저장하면 합산됩니다.</span>
                 </div>
 
-                {/* 항목별(단계별) 점수 */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {PBL_STAGES.map((s, i) => {
                     const a = sub?.auto?.[s.key];

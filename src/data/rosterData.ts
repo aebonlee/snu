@@ -62,3 +62,24 @@ export const collegeDistribution = (): { college: string; count: number }[] => {
   return Array.from(m, ([college, count]) => ({ college, count }))
     .sort((a, b) => b.count - a.count || a.college.localeCompare(b.college));
 };
+
+const uniq = (arr: string[]) => Array.from(new Set(arr.filter(Boolean)));
+
+/** 명단 기준 선택 옵션 (기본정보 입력·명단 대조용) */
+export const COLLEGES = uniq(ROSTER.map((s) => s.college));
+export const COURSE_TYPES = uniq(ROSTER.map((s) => s.courseType));
+export const MAJOR_TYPES = uniq(ROSTER.map((s) => s.majorType)); // '' 포함될 수 있음
+
+export const departmentsOf = (college: string): string[] =>
+  uniq(ROSTER.filter((s) => s.college === college).map((s) => s.department));
+
+export const majorsOf = (college: string, department: string): string[] =>
+  uniq(ROSTER.filter((s) => s.college === college && s.department === department).map((s) => s.major));
+
+/** 명단 대조 — 대학·학과(필수) + 전공(있으면) 일치 행이 있는지 */
+export const matchRoster = (college: string, department: string, major?: string): boolean => {
+  if (!college || !department) return false;
+  return ROSTER.some(
+    (s) => s.college === college && s.department === department && (!major || !s.major || s.major === major),
+  );
+};

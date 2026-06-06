@@ -90,9 +90,12 @@ const PblEval = (): ReactElement => {
                   <span className="pgd-hero-icon" style={{ background: '#0046C818', color: '#0046C8' }}>🎓</span>
                   <div style={{ minWidth: 0 }}>
                     <h3 className="pgd-hero-title" style={{ marginBottom: '6px' }}>{sel.student_name || '(이름없음)'}</h3>
-                    {/* 1줄: 개인정보 */}
+                    {/* 1줄: 개인정보 + 소속 + 명단 대조 */}
                     <p className="pgd-hero-subtitle" style={{ margin: '0 0 8px' }}>
-                      {sel.student_no || '-'} · {sel.major || '-'} · {sel.phone || '-'} · {sel.track || '-'} 트랙
+                      {sel.student_no || '-'} · {sel.college || '-'} {sel.department || ''} {sel.major || ''} · {sel.phone || '-'} · {sel.track || '-'} 트랙
+                      {sel.roster_matched
+                        ? <span style={{ marginLeft: '8px', fontSize: '11.5px', fontWeight: 700, padding: '1px 8px', borderRadius: '999px', background: '#d1fae5', color: '#065f46' }}>명단 확인</span>
+                        : <span style={{ marginLeft: '8px', fontSize: '11.5px', fontWeight: 700, padding: '1px 8px', borderRadius: '999px', background: '#fee2e2', color: '#991b1b' }}>명단외</span>}
                     </p>
                     {/* 2줄: 주제 + 점수 */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', fontSize: '13px' }}>
