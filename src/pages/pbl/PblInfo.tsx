@@ -197,7 +197,7 @@ const PblInfo = (): ReactElement => {
 
                 <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'stretch' }}>
                   {/* 좌측 2/3 — 항목별 막대 */}
-                  <div style={{ flex: '2 1 360px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ flex: '2 1 360px', minWidth: 0, paddingRight: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {PBL_STAGES.map((s, i) => {
                       const a = sub?.auto?.[s.key];
                       const t = sub?.scores?.[s.key];
