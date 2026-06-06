@@ -31,7 +31,7 @@ const PblSidebar = ({ active, auto, scores }: Props): ReactElement => (
               <span style={{ fontSize: '11.5px', opacity: on ? 0.9 : 0.7 }}>
                 {hasScore ? (
                   <>
-                    {typeof a === 'number' && `자동 ${autoStagePoints(a, s.max)}/${s.max}`}
+                    {typeof a === 'number' && `${autoStagePoints(a, s.max)}/${s.max}`}
                     {typeof t === 'number' && `${typeof a === 'number' ? ' · ' : ''}강사 ${t}/${s.max}`}
                   </>
                 ) : `${s.max}점`}
