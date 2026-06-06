@@ -158,12 +158,12 @@ const PblInfo = (): ReactElement => {
                     const t = sub?.scores?.[s.key];
                     const pts = typeof a === 'number' ? autoStagePoints(a, s.max) : 0;
                     return (
-                      <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ width: '150px', flexShrink: 0, fontSize: '13px', fontWeight: 600 }}>{s.icon} {i + 1}. {s.label}</span>
-                        <div style={{ flex: 1, height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
+                      <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ flex: '0 0 240px', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.icon} {i + 1}. {s.label}</span>
+                        <div style={{ flex: '1 1 80px', maxWidth: '160px', height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
                           <div style={{ width: `${(pts / s.max) * 100}%`, height: '100%', background: s.color, transition: 'width .3s' }} />
                         </div>
-                        <span style={{ width: '130px', flexShrink: 0, textAlign: 'right', fontSize: '12.5px', fontWeight: 700 }}>
+                        <span style={{ flex: '0 0 110px', textAlign: 'right', fontSize: '12.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
                           {typeof a === 'number' ? <span style={{ color: s.color }}>자동 {pts}/{s.max}</span> : <span style={{ color: 'var(--text-secondary)' }}>미작성</span>}
                           {typeof t === 'number' && <span style={{ color: '#92400e' }}> · 강사 {t}</span>}
                         </span>
