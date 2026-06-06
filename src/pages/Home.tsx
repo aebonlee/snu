@@ -134,7 +134,7 @@ const Home = (): ReactElement => {
             <h2 className="section-title">ESG · 환경 주제 분야 (학생 선택형)</h2>
             <p className="section-subtitle">사회·환경 문제 해결형 프로젝트 — 관심 주제를 선택해 팀 프로젝트를 설계합니다.</p>
           </div>
-          <div className="course-cards">
+          <div className="course-cards four">
             {domains.map((d) => (
               <div key={d.title} className="course-card" style={{ borderTopColor: '#00855A' }}>
                 <div className="course-card-icon">{d.icon}</div>
