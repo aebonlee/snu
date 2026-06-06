@@ -122,7 +122,7 @@ const Lessons = (): ReactElement => {
           {/* 3시간 강의 내용 (강의안 본문) */}
           {content && (
             <section className="pgd-section">
-              <h2><span className="pgd-section-icon">📖</span> 강의 내용 (3시간)</h2>
+              <h2><span className="pgd-section-icon">📖</span> 강의 노트</h2>
               <div className="pgd-card" style={{ marginBottom: '14px' }}>
                 <p style={{ margin: '0 0 10px', lineHeight: 1.75 }}>{content.overview}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
@@ -137,7 +137,6 @@ const Lessons = (): ReactElement => {
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
                     <span style={{ flexShrink: 0, fontSize: '13px', fontWeight: 800, color: '#fff', background: color, borderRadius: '6px', padding: '2px 9px' }}>{si + 1}</span>
                     <h3 style={{ margin: 0, fontSize: '16.5px', flex: 1, minWidth: 0 }}>{sec.heading}</h3>
-                    <span style={{ flexShrink: 0, fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>⏱ {sec.minutes}분</span>
                   </div>
                   <ul style={{ margin: '0 0 10px', paddingLeft: '18px', lineHeight: 1.85 }}>
                     {sec.points.map((p, pi) => <li key={pi}>{p}</li>)}
