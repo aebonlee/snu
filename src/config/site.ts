@@ -85,6 +85,7 @@ const site: SiteConfig = {
         { path: '/pbl/mentoring', labelKey: 'site.nav.pblMentoring' },
         { path: '/pbl/build', labelKey: 'site.nav.pblBuild' },
         { path: '/pbl/final', labelKey: 'site.nav.pblFinal' },
+        { path: '/pbl/rubric', labelKey: 'site.nav.pblRubric' },
         { path: '/pbl/eval', labelKey: 'site.nav.pblEval' },
       ]
     },
