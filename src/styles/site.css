@@ -1067,3 +1067,7 @@ html[data-color="purple"] {
   .pbl-score-label { flex: 1 1 120px; }
   .pbl-score-bar { flex: 1 1 50px; min-width: 40px; }
 }
+
+/* 트랙 카드 2열(각 1/2) — 모바일 1열 */
+.course-cards.two { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 768px) { .course-cards.two { grid-template-columns: 1fr; } }

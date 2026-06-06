@@ -114,7 +114,7 @@ const Home = (): ReactElement => {
             <h2 className="section-title">두 개의 트랙으로 함께 달립니다</h2>
             <p className="section-subtitle">학생의 관심 도메인에 따라 기술 트랙 / 인문 트랙으로 역할을 분담해 협업합니다.</p>
           </div>
-          <div className="course-cards">
+          <div className="course-cards two">
             {tracks.map((tr) => (
               <div key={tr.title} className="course-card" style={{ borderTopColor: tr.color }}>
                 <div className="course-card-icon">{tr.icon}</div>
