@@ -18,6 +18,7 @@ const Classroom = lazy(() => import('../pages/Classroom'));
 const Learning = lazy(() => import('../pages/Learning'));
 const Assessment = lazy(() => import('../pages/Assessment'));
 const ProjectGuide = lazy(() => import('../pages/ProjectGuide'));
+const ProjectBuild = lazy(() => import('../pages/ProjectBuild'));
 const ProjectBoard = lazy(() => import('../pages/ProjectBoard'));
 const ProjectVote = lazy(() => import('../pages/ProjectVote'));
 const PblInfo = lazy(() => import('../pages/pbl/PblInfo'));
@@ -86,6 +87,8 @@ const PublicLayout = (): ReactElement => {
             <Route path="/assessment/:type" element={<Assessment />} />
             <Route path="/project-guide" element={<ProjectGuide />} />
             <Route path="/project-guide/:id" element={<ProjectGuide />} />
+            <Route path="/project-build" element={<ProjectBuild />} />
+            <Route path="/project-build/:id" element={<ProjectBuild />} />
             <Route path="/project-vote" element={<AuthGuard><ProjectVote /></AuthGuard>} />
             <Route path="/project-teams" element={<Navigate to="/project-vote" replace />} />
             <Route path="/project-board" element={<AuthGuard><ProjectBoard /></AuthGuard>} />
