@@ -73,6 +73,21 @@ const site: SiteConfig = {
         { path: '/projects/apps', labelKey: 'site.nav.projectApps' },
       ]
     },
+    {
+      labelKey: 'site.nav.pbl',
+      path: '/pbl/info',
+      activePath: '/pbl',
+      dropdown: [
+        { path: '/pbl/info', labelKey: 'site.nav.pblInfo' },
+        { path: '/pbl/problem', labelKey: 'site.nav.pblProblem' },
+        { path: '/pbl/teaming', labelKey: 'site.nav.pblTeaming' },
+        { path: '/pbl/midreview', labelKey: 'site.nav.pblMidreview' },
+        { path: '/pbl/mentoring', labelKey: 'site.nav.pblMentoring' },
+        { path: '/pbl/build', labelKey: 'site.nav.pblBuild' },
+        { path: '/pbl/final', labelKey: 'site.nav.pblFinal' },
+        { path: '/pbl/eval', labelKey: 'site.nav.pblEval' },
+      ]
+    },
     { path: '/resources', labelKey: 'site.nav.resources' },
     {
       labelKey: 'site.nav.lms',

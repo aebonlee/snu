@@ -19,6 +19,9 @@ const Assessment = lazy(() => import('../pages/Assessment'));
 const ProjectGuide = lazy(() => import('../pages/ProjectGuide'));
 const ProjectBoard = lazy(() => import('../pages/ProjectBoard'));
 const ProjectVote = lazy(() => import('../pages/ProjectVote'));
+const PblInfo = lazy(() => import('../pages/pbl/PblInfo'));
+const PblStage = lazy(() => import('../pages/pbl/PblStage'));
+const PblEval = lazy(() => import('../pages/pbl/PblEval'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 // Auth 페이지
@@ -82,6 +85,12 @@ const PublicLayout = (): ReactElement => {
             <Route path="/project-vote" element={<AuthGuard><ProjectVote /></AuthGuard>} />
             <Route path="/project-teams" element={<Navigate to="/project-vote" replace />} />
             <Route path="/project-board" element={<AuthGuard><ProjectBoard /></AuthGuard>} />
+
+            {/* PBL 활동 */}
+            <Route path="/pbl" element={<Navigate to="/pbl/info" replace />} />
+            <Route path="/pbl/info" element={<AuthGuard><PblInfo /></AuthGuard>} />
+            <Route path="/pbl/eval" element={<AdminGuard><PblEval /></AdminGuard>} />
+            <Route path="/pbl/:stage" element={<AuthGuard><PblStage /></AuthGuard>} />
 
             {/* Auth */}
             {site.features.auth && (

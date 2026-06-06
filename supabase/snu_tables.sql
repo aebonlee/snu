@@ -483,3 +483,40 @@ CREATE POLICY "snu_team_posts_insert" ON snu_team_posts FOR INSERT
 DROP POLICY IF EXISTS "snu_teams_delete" ON snu_teams;
 CREATE POLICY "snu_teams_delete" ON snu_teams FOR DELETE
   USING ((auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr'));
+
+-- ============================================
+-- PBL 활동 제출 (snu_pbl_submissions) — user당 1행
+-- ============================================
+CREATE TABLE IF NOT EXISTS snu_pbl_submissions (
+    user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT DEFAULT '',
+    student_name TEXT DEFAULT '',
+    team_name TEXT DEFAULT '',
+    region TEXT DEFAULT '',
+    topic_key TEXT DEFAULT '',
+    track TEXT DEFAULT '',
+    content JSONB NOT NULL DEFAULT '{}'::jsonb,
+    scores JSONB NOT NULL DEFAULT '{}'::jsonb,
+    feedback JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE snu_pbl_submissions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "snu_pbl_select" ON snu_pbl_submissions;
+CREATE POLICY "snu_pbl_select" ON snu_pbl_submissions FOR SELECT
+  USING (auth.uid() = user_id
+    OR (auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr'));
+
+DROP POLICY IF EXISTS "snu_pbl_insert" ON snu_pbl_submissions;
+CREATE POLICY "snu_pbl_insert" ON snu_pbl_submissions FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "snu_pbl_update" ON snu_pbl_submissions;
+CREATE POLICY "snu_pbl_update" ON snu_pbl_submissions FOR UPDATE
+  USING (auth.uid() = user_id
+    OR (auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr'));
+
+DROP POLICY IF EXISTS "snu_pbl_delete" ON snu_pbl_submissions;
+CREATE POLICY "snu_pbl_delete" ON snu_pbl_submissions FOR DELETE
+  USING ((auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr'));
