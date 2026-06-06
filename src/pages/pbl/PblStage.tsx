@@ -4,8 +4,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import SEOHead from '../../components/SEOHead';
 import { PBL_STAGES, stageByKey, autoStagePoints } from '../../config/pblActivity';
-import { getMySubmission, saveStageContent } from '../../utils/pblStore';
+import { getMySubmission, saveStageContent, type PblSubmission } from '../../utils/pblStore';
 import { evaluateWriting, PBL_STAGE_KEYWORDS, type EvalResult } from '../../utils/promptEval';
+import PblSidebar from './PblSidebar';
 
 const textarea: React.CSSProperties = {
   width: '100%', minHeight: '120px', padding: '12px 14px', fontSize: '15px', lineHeight: 1.7,
@@ -20,6 +21,7 @@ const PblStage = (): ReactElement => {
   const { showToast } = useToast();
   const stage = stageKey ? stageByKey(stageKey) : undefined;
 
+  const [sub, setSub] = useState<PblSubmission | null>(null);
   const [values, setValues] = useState<Record<string, string>>({});
   const [savedAuto, setSavedAuto] = useState<number | null>(null);
   const [score, setScore] = useState<number | null>(null);
@@ -30,6 +32,7 @@ const PblStage = (): ReactElement => {
   const load = useCallback(async () => {
     if (!stage) return;
     const row = await getMySubmission(user);
+    setSub(row);
     setValues(row?.content?.[stage.key] || {});
     setSavedAuto(typeof row?.auto?.[stage.key] === 'number' ? row!.auto[stage.key] : null);
     setScore(typeof row?.scores?.[stage.key] === 'number' ? row!.scores[stage.key] : null);
@@ -39,7 +42,6 @@ const PblStage = (): ReactElement => {
 
   useEffect(() => { setLoaded(false); load(); }, [load]);
 
-  // 자동 평가 (작성 내용 실시간 채점)
   const evalResult: EvalResult | null = useMemo(() => {
     if (!stage) return null;
     const text = stage.fields.map((f) => values[f.id] || '').filter(Boolean).join('\n');
@@ -49,8 +51,8 @@ const PblStage = (): ReactElement => {
   if (!stage) {
     return (
       <>
-        <SEOHead title="PBL 활동" path="/pbl" noindex />
-        <section className="page-header"><div className="container"><h2>PBL 활동</h2><p>존재하지 않는 단계입니다.</p></div></section>
+        <SEOHead title="개인별 PBL활동" path="/pbl" noindex />
+        <section className="page-header"><div className="container"><h2>개인별 PBL활동</h2><p>존재하지 않는 단계입니다.</p></div></section>
       </>
     );
   }
@@ -58,6 +60,8 @@ const PblStage = (): ReactElement => {
   const idx = PBL_STAGES.findIndex((s) => s.key === stage.key);
   const prev = PBL_STAGES[idx - 1];
   const next = PBL_STAGES[idx + 1];
+  // 사이드바에 실시간 자동 점수도 반영
+  const liveAuto = { ...(sub?.auto || {}), ...(evalResult ? { [stage.key]: evalResult.score } : {}) };
 
   const handleSave = async () => {
     setSaving(true);
@@ -65,6 +69,7 @@ const PblStage = (): ReactElement => {
       const auto = evalResult ? evalResult.score : null;
       await saveStageContent(user, stage.key, values, auto);
       setSavedAuto(auto);
+      setSub((p) => p ? { ...p, content: { ...p.content, [stage.key]: values }, auto: { ...p.auto, ...(auto !== null ? { [stage.key]: auto } : {}) } } : p);
       showToast('저장했습니다. (작성 내용 + 자동 점수)', 'success');
     } catch (e: any) {
       showToast('저장 실패: ' + (e?.message || ''), 'error');
@@ -73,7 +78,7 @@ const PblStage = (): ReactElement => {
 
   return (
     <>
-      <SEOHead title={`PBL 활동 · ${stage.label}`} path={`/pbl/${stage.key}`} noindex />
+      <SEOHead title={`개인별 PBL활동 · ${stage.label}`} path={`/pbl/${stage.key}`} noindex />
       <section className="page-header">
         <div className="container">
           <h2>{stage.icon} {idx + 1}. {stage.label}</h2>
@@ -81,19 +86,10 @@ const PblStage = (): ReactElement => {
         </div>
       </section>
 
-      <section className="section">
-        <div className="container" style={{ maxWidth: '820px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-          {/* 단계 네비 */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-            {PBL_STAGES.map((s, i) => (
-              <Link key={s.key} to={`/pbl/${s.key}`} style={{
-                fontSize: '12.5px', fontWeight: 700, padding: '5px 12px', borderRadius: '999px', textDecoration: 'none',
-                background: s.key === stage.key ? s.color : 'var(--bg-light-gray)',
-                color: s.key === stage.key ? '#fff' : 'var(--text-secondary)',
-              }}>{i + 1}. {s.label}</Link>
-            ))}
-          </div>
+      <div className="sidebar-layout">
+        <PblSidebar active={stage.key} auto={liveAuto} scores={sub?.scores} />
 
+        <div className="sidebar-content" style={{ display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '820px' }}>
           {/* 루브릭 */}
           <div style={{ padding: '12px 16px', borderRadius: '10px', background: `${stage.color}12`, fontSize: '13.5px', color: 'var(--text-secondary)' }}>
             <strong style={{ color: stage.color }}>평가 기준 ({stage.max}점)</strong> · {stage.rubric}
@@ -111,7 +107,7 @@ const PblStage = (): ReactElement => {
                 </div>
               ))}
 
-              {/* 자동 평가 결과 */}
+              {/* 자동 평가 결과 (항목별) */}
               {evalResult ? (
                 <div style={{ padding: '18px 20px', borderRadius: '14px', border: `2px solid ${evalResult.color}`, background: 'var(--bg-white)' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
@@ -122,7 +118,6 @@ const PblStage = (): ReactElement => {
                       이 단계 환산 <strong style={{ color: stage.color }}>{autoStagePoints(evalResult.score, stage.max)} / {stage.max}점</strong>
                     </span>
                   </div>
-                  {/* 항목별 막대 */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
                     {evalResult.breakdown.map((b) => (
                       <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px' }}>
@@ -150,7 +145,6 @@ const PblStage = (): ReactElement => {
                 </p>
               )}
 
-              {/* 강사 평가(있으면) */}
               {(score !== null || feedback) && (
                 <div style={{ padding: '14px 16px', borderRadius: '10px', border: `1px solid ${stage.color}`, background: 'var(--bg-white)' }}>
                   <div style={{ fontSize: '13px', fontWeight: 800, color: stage.color, marginBottom: '4px' }}>
@@ -171,7 +165,7 @@ const PblStage = (): ReactElement => {
             </>
           )}
         </div>
-      </section>
+      </div>
     </>
   );
 };

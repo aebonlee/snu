@@ -82,29 +82,24 @@ const Lessons = (): ReactElement => {
 
         <div className="sidebar-content">
           {/* 히어로 */}
-          <div className="pgd-hero-card" style={{ borderLeftColor: color, gap: '24px', alignItems: 'center' }}>
+          <div className="pgd-hero-card" style={{ borderLeftColor: color, gap: '28px', alignItems: 'center' }}>
             <span
               className="pgd-hero-icon"
               style={{
                 background: `${color}18`, color,
-                width: 'auto', height: 'auto', minWidth: '92px',
-                padding: '14px 18px', borderRadius: '12px',
-                fontSize: '20px', fontWeight: 900, letterSpacing: '0.02em',
+                width: '120px', height: '64px', minWidth: '120px', borderRadius: '12px',
+                fontSize: '24px', fontWeight: 900, letterSpacing: '0.02em',
                 whiteSpace: 'nowrap', flexShrink: 0,
               }}
             >
               {dayLabel(session.no)}
             </span>
             <div style={{ minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                <span style={{ fontSize: '12.5px', fontWeight: 800, padding: '3px 12px', borderRadius: '999px', background: `${color}18`, color }}>
-                  {fmtDate(session.date, session.weekday)} · {session.time}
-                </span>
-                <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-                  {session.modeLabel ?? MODE_LABEL[session.mode]} · {session.instructor ?? '-'}
-                </span>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '10px' }}>
+                <span style={{ color, fontWeight: 800 }}>{fmtDate(session.date, session.weekday)} · {session.time}</span>
+                {'  '}{session.modeLabel ?? MODE_LABEL[session.mode]} · {session.instructor ?? '-'}
               </div>
-              <h3 className="pgd-hero-title" style={{ margin: 0, fontSize: '1.35rem' }}>{session.title}</h3>
+              <h3 className="pgd-hero-title" style={{ margin: 0, fontSize: '1.4rem', lineHeight: 1.35 }}>{session.title}</h3>
             </div>
           </div>
 

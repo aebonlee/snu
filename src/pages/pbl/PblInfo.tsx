@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, type ReactElement } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import SEOHead from '../../components/SEOHead';
@@ -8,6 +7,7 @@ import { REGIONS, topicsByRegion, type Region } from '../../data/projectTopics';
 import { TRACKS } from '../../utils/projectTeams';
 import { PBL_STAGES, PBL_TOTAL, autoTotal, autoStagePoints } from '../../config/pblActivity';
 import { getMySubmission, saveInfo, type PblSubmission } from '../../utils/pblStore';
+import PblSidebar from './PblSidebar';
 
 const input: React.CSSProperties = {
   width: '100%', padding: '11px 13px', fontSize: '15px', boxSizing: 'border-box',
@@ -53,19 +53,14 @@ const PblInfo = (): ReactElement => {
     if (!form.student_no.trim()) { showToast('학번을 입력해 주세요.', 'warning'); return; }
     setSaving(true);
     try {
-      // 1) PBL 제출 기본정보 저장
       await saveInfo(user, form);
-      // 2) 회원정보(user_profiles)에도 반영
       try {
         await updateProfile(user.id, {
-          name: form.student_name,
-          display_name: form.student_name,
-          phone: form.phone,
-          student_no: form.student_no,
-          major: form.major,
+          name: form.student_name, display_name: form.student_name,
+          phone: form.phone, student_no: form.student_no, major: form.major,
         });
         if (refreshProfile) await refreshProfile();
-      } catch { /* 프로필 반영 실패는 무시(제출은 저장됨) */ }
+      } catch { /* 프로필 반영 실패 무시 */ }
       showToast('기본정보를 저장하고 회원정보에 반영했습니다.', 'success');
       load();
     } catch (e: any) {
@@ -79,12 +74,17 @@ const PblInfo = (): ReactElement => {
       <section className="page-header">
         <div className="container">
           <h2>개인별 PBL활동 · 기본정보</h2>
-          <p>나의 정보를 입력하고 단계별 활동을 진행합니다. 작성 내용은 자동 평가되어 점수로 저장되며, 반복해 다듬을수록 실력이 향상됩니다.</p>
+          <p>
+            나의 정보를 입력하고 단계별 활동을 진행합니다.<br />
+            작성 내용은 자동 평가되어 점수로 저장되며, 반복해 다듬을수록 실력이 향상됩니다.
+          </p>
         </div>
       </section>
 
-      <section className="section">
-        <div className="container" style={{ maxWidth: '720px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+      <div className="sidebar-layout">
+        <PblSidebar active="info" auto={sub?.auto} scores={sub?.scores} />
+
+        <div className="sidebar-content" style={{ display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '720px' }}>
           {!loaded ? (
             <div style={{ textAlign: 'center', padding: '40px' }}><div className="loading-spinner" style={{ margin: '0 auto' }} /></div>
           ) : (
@@ -92,7 +92,7 @@ const PblInfo = (): ReactElement => {
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'var(--bg-light-gray)', borderRadius: '8px', padding: '10px 14px' }}>
                 입력한 이름·학번·전공·연락처는 <strong>회원정보에도 함께 저장</strong>됩니다.
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>이름 *</label>
                   <input style={input} value={form.student_name} onChange={(e) => setForm({ ...form, student_name: e.target.value })} placeholder="이름" />
@@ -121,7 +121,6 @@ const PblInfo = (): ReactElement => {
                 </div>
               </div>
 
-              {/* 관심 프로젝트 주제 (선택) */}
               <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '12px' }}>
                 <div>
                   <label style={labelStyle}>관심 지역</label>
@@ -142,38 +141,33 @@ const PblInfo = (): ReactElement => {
                 {saving ? '저장 중…' : '기본정보 저장 (회원정보 반영)'}
               </button>
 
-              {/* 내 점수 요약 */}
-              <div style={{ marginTop: '12px', padding: '18px 20px', borderRadius: '14px', background: 'var(--bg-light-gray)' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+              {/* 내 자동 평가 점수 — 항목별 */}
+              <div style={{ marginTop: '8px', padding: '20px 22px', borderRadius: '14px', border: '1px solid var(--border-light)', background: 'var(--bg-white)' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap', marginBottom: '14px' }}>
                   <span style={{ fontSize: '15px', fontWeight: 800 }}>🤖 내 자동 평가 점수</span>
                   <span style={{ fontSize: '28px', fontWeight: 900, color: 'var(--primary-blue)' }}>
                     {autoTotal(sub?.auto)}<span style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>/{PBL_TOTAL}</span>
                   </span>
-                  <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>각 단계에서 저장하면 합산됩니다. 다듬을수록 점수가 오릅니다.</span>
+                  <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>각 단계에서 저장하면 합산됩니다.</span>
                 </div>
-              </div>
 
-              {/* 단계 바로가기 */}
-              <div style={{ marginTop: '4px' }}>
-                <h3 style={{ fontSize: '16px', marginBottom: '10px' }}>PBL 활동 단계</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {/* 항목별(단계별) 점수 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {PBL_STAGES.map((s, i) => {
                     const a = sub?.auto?.[s.key];
-                    const teacher = sub?.scores?.[s.key];
+                    const t = sub?.scores?.[s.key];
+                    const pts = typeof a === 'number' ? autoStagePoints(a, s.max) : 0;
                     return (
-                    <Link key={s.key} to={`/pbl/${s.key}`} style={{
-                      display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px',
-                      border: '1px solid var(--border-light)', borderRadius: '10px', textDecoration: 'none',
-                      color: 'var(--text-primary)', borderLeft: `4px solid ${s.color}`,
-                    }}>
-                      <span style={{ fontSize: '18px' }}>{s.icon}</span>
-                      <span style={{ fontWeight: 700 }}>{i + 1}. {s.label}</span>
-                      <span style={{ marginLeft: 'auto', fontSize: '12.5px', color: 'var(--text-secondary)', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        {typeof a === 'number' && <span style={{ fontWeight: 700, color: s.color }}>자동 {autoStagePoints(a, s.max)}/{s.max}</span>}
-                        {typeof teacher === 'number' && <span style={{ fontWeight: 700, color: '#92400e' }}>강사 {teacher}/{s.max}</span>}
-                        {typeof a !== 'number' && typeof teacher !== 'number' && <span>{s.max}점</span>}
-                      </span>
-                    </Link>
+                      <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{ width: '150px', flexShrink: 0, fontSize: '13px', fontWeight: 600 }}>{s.icon} {i + 1}. {s.label}</span>
+                        <div style={{ flex: 1, height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
+                          <div style={{ width: `${(pts / s.max) * 100}%`, height: '100%', background: s.color, transition: 'width .3s' }} />
+                        </div>
+                        <span style={{ width: '130px', flexShrink: 0, textAlign: 'right', fontSize: '12.5px', fontWeight: 700 }}>
+                          {typeof a === 'number' ? <span style={{ color: s.color }}>자동 {pts}/{s.max}</span> : <span style={{ color: 'var(--text-secondary)' }}>미작성</span>}
+                          {typeof t === 'number' && <span style={{ color: '#92400e' }}> · 강사 {t}</span>}
+                        </span>
+                      </div>
                     );
                   })}
                 </div>
@@ -181,7 +175,7 @@ const PblInfo = (): ReactElement => {
             </>
           )}
         </div>
-      </section>
+      </div>
     </>
   );
 };
