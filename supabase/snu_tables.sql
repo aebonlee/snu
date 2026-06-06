@@ -496,6 +496,7 @@ CREATE TABLE IF NOT EXISTS snu_pbl_submissions (
     topic_key TEXT DEFAULT '',
     track TEXT DEFAULT '',
     content JSONB NOT NULL DEFAULT '{}'::jsonb,
+    auto JSONB NOT NULL DEFAULT '{}'::jsonb,
     scores JSONB NOT NULL DEFAULT '{}'::jsonb,
     feedback JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ DEFAULT now(),

@@ -89,6 +89,17 @@ export const PBL_TOTAL = PBL_STAGES.reduce((s, st) => s + st.max, 0); // 100
 export const stageByKey = (key: string): PblStage | undefined =>
   PBL_STAGES.find((s) => s.key === key);
 
-/** 제출 행의 단계별 점수 합 */
+/** 제출 행의 단계별(강사) 점수 합 */
 export const totalScore = (scores: Record<string, number> | undefined): number =>
   PBL_STAGES.reduce((s, st) => s + (typeof scores?.[st.key] === 'number' ? scores![st.key] : 0), 0);
+
+/** 자동 평가(0~100) → 단계 배점으로 환산한 한 단계 점수 */
+export const autoStagePoints = (auto100: number, max: number): number =>
+  Math.round((auto100 / 100) * max);
+
+/** 자동 평가 기준 환산 총점 (각 단계 배점 합 = 100점 만점) */
+export const autoTotal = (auto: Record<string, number> | undefined): number =>
+  PBL_STAGES.reduce(
+    (s, st) => s + (typeof auto?.[st.key] === 'number' ? autoStagePoints(auto![st.key], st.max) : 0),
+    0,
+  );

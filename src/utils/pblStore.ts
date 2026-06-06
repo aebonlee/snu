@@ -1,6 +1,7 @@
 /**
  * PBL 활동 제출 저장/조회 — Supabase (snu_pbl_submissions, user당 1행).
  *  - content  jsonb: { [stageKey]: { [fieldId]: string } }  (학생 작성)
+ *  - auto     jsonb: { [stageKey]: number(0~100) }           (자동 평가 점수, 학생 본인)
  *  - scores   jsonb: { [stageKey]: number }                  (강사 평가)
  *  - feedback jsonb: { [stageKey]: string }                  (강사 피드백)
  */
@@ -26,6 +27,7 @@ export interface PblSubmission {
   topic_key: string;
   track: string;
   content: Record<string, Record<string, string>>;
+  auto: Record<string, number>;
   scores: Record<string, number>;
   feedback: Record<string, string>;
   updated_at?: string;
@@ -58,18 +60,21 @@ export async function saveInfo(user: AuthUser, info: PblInfo): Promise<void> {
   if (error) throw error;
 }
 
-/** 단계 콘텐츠 저장 — 해당 단계만 병합 후 upsert */
+/** 단계 콘텐츠 + 자동 평가 점수 저장 — 해당 단계만 병합 후 upsert */
 export async function saveStageContent(
-  user: AuthUser, stageKey: string, fields: Record<string, string>,
+  user: AuthUser, stageKey: string, fields: Record<string, string>, autoScore?: number | null,
 ): Promise<void> {
   const client = getSupabase();
   if (!client || !user) throw new Error('로그인이 필요합니다.');
   const current = await getMySubmission(user);
   const content = { ...(current?.content || {}), [stageKey]: fields };
+  const auto = { ...(current?.auto || {}) };
+  if (typeof autoScore === 'number') auto[stageKey] = autoScore;
   const row = {
     user_id: user.id,
     email: user.email || '',
     content,
+    auto,
     updated_at: new Date().toISOString(),
   };
   const { error } = await client.from(PBL_TABLE).upsert(row, { onConflict: 'user_id' });

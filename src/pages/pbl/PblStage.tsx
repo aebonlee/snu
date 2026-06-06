@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback, type ReactElement } from 'react';
+import { useState, useEffect, useCallback, useMemo, type ReactElement } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import SEOHead from '../../components/SEOHead';
-import { PBL_STAGES, stageByKey } from '../../config/pblActivity';
+import { PBL_STAGES, stageByKey, autoStagePoints } from '../../config/pblActivity';
 import { getMySubmission, saveStageContent } from '../../utils/pblStore';
+import { evaluateWriting, PBL_STAGE_KEYWORDS, type EvalResult } from '../../utils/promptEval';
 
 const textarea: React.CSSProperties = {
   width: '100%', minHeight: '120px', padding: '12px 14px', fontSize: '15px', lineHeight: 1.7,
@@ -20,6 +21,7 @@ const PblStage = (): ReactElement => {
   const stage = stageKey ? stageByKey(stageKey) : undefined;
 
   const [values, setValues] = useState<Record<string, string>>({});
+  const [savedAuto, setSavedAuto] = useState<number | null>(null);
   const [score, setScore] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<string>('');
   const [saving, setSaving] = useState(false);
@@ -29,12 +31,20 @@ const PblStage = (): ReactElement => {
     if (!stage) return;
     const row = await getMySubmission(user);
     setValues(row?.content?.[stage.key] || {});
+    setSavedAuto(typeof row?.auto?.[stage.key] === 'number' ? row!.auto[stage.key] : null);
     setScore(typeof row?.scores?.[stage.key] === 'number' ? row!.scores[stage.key] : null);
     setFeedback(row?.feedback?.[stage.key] || '');
     setLoaded(true);
   }, [user, stage]);
 
   useEffect(() => { setLoaded(false); load(); }, [load]);
+
+  // 자동 평가 (작성 내용 실시간 채점)
+  const evalResult: EvalResult | null = useMemo(() => {
+    if (!stage) return null;
+    const text = stage.fields.map((f) => values[f.id] || '').filter(Boolean).join('\n');
+    return evaluateWriting(text, PBL_STAGE_KEYWORDS[stage.key] || []);
+  }, [values, stage]);
 
   if (!stage) {
     return (
@@ -52,8 +62,10 @@ const PblStage = (): ReactElement => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await saveStageContent(user, stage.key, values);
-      showToast('저장했습니다.', 'success');
+      const auto = evalResult ? evalResult.score : null;
+      await saveStageContent(user, stage.key, values, auto);
+      setSavedAuto(auto);
+      showToast('저장했습니다. (작성 내용 + 자동 점수)', 'success');
     } catch (e: any) {
       showToast('저장 실패: ' + (e?.message || ''), 'error');
     } finally { setSaving(false); }
@@ -99,11 +111,50 @@ const PblStage = (): ReactElement => {
                 </div>
               ))}
 
-              {/* 강사 평가 표시(읽기 전용) */}
+              {/* 자동 평가 결과 */}
+              {evalResult ? (
+                <div style={{ padding: '18px 20px', borderRadius: '14px', border: `2px solid ${evalResult.color}`, background: 'var(--bg-white)' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 800 }}>🤖 자동 평가</span>
+                    <span style={{ fontSize: '26px', fontWeight: 900, color: evalResult.color }}>{evalResult.score}<span style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>/100</span></span>
+                    <span style={{ fontSize: '13px', fontWeight: 800, color: '#fff', background: evalResult.color, padding: '2px 10px', borderRadius: '999px' }}>{evalResult.grade}</span>
+                    <span style={{ marginLeft: 'auto', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                      이 단계 환산 <strong style={{ color: stage.color }}>{autoStagePoints(evalResult.score, stage.max)} / {stage.max}점</strong>
+                    </span>
+                  </div>
+                  {/* 항목별 막대 */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+                    {evalResult.breakdown.map((b) => (
+                      <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px' }}>
+                        <span style={{ width: '56px', color: 'var(--text-secondary)' }}>{b.label}</span>
+                        <div style={{ flex: 1, height: '8px', borderRadius: '4px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
+                          <div style={{ width: `${(b.got / b.max) * 100}%`, height: '100%', background: evalResult.color }} />
+                        </div>
+                        <span style={{ width: '48px', textAlign: 'right', fontWeight: 700 }}>{b.got}/{b.max}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+                    {evalResult.tips.map((t, i) => <li key={i}>{t}</li>)}
+                  </ul>
+                </div>
+              ) : (
+                <div style={{ padding: '14px 16px', borderRadius: '10px', background: 'var(--bg-light-gray)', fontSize: '13.5px', color: 'var(--text-secondary)' }}>
+                  내용을 작성하면 자동 평가 점수가 즉시 표시됩니다.
+                </div>
+              )}
+
+              {savedAuto !== null && (
+                <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  💾 저장된 자동 점수: <strong>{savedAuto}/100</strong> (환산 {autoStagePoints(savedAuto, stage.max)}/{stage.max}점)
+                </p>
+              )}
+
+              {/* 강사 평가(있으면) */}
               {(score !== null || feedback) && (
                 <div style={{ padding: '14px 16px', borderRadius: '10px', border: `1px solid ${stage.color}`, background: 'var(--bg-white)' }}>
                   <div style={{ fontSize: '13px', fontWeight: 800, color: stage.color, marginBottom: '4px' }}>
-                    강사 평가 {score !== null && <>· {score} / {stage.max}점</>}
+                    👩‍🏫 강사 평가 {score !== null && <>· {score} / {stage.max}점</>}
                   </div>
                   {feedback && <p style={{ margin: 0, fontSize: '14px', whiteSpace: 'pre-wrap' }}>{feedback}</p>}
                 </div>
@@ -111,11 +162,11 @@ const PblStage = (): ReactElement => {
 
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <button className="btn btn-primary" style={{ padding: '11px 26px' }} disabled={saving} onClick={handleSave}>
-                  {saving ? '저장 중…' : '이 단계 저장'}
+                  {saving ? '저장 중…' : '저장 (내용 + 점수)'}
                 </button>
                 {prev && <button className="btn btn-secondary" style={{ padding: '11px 18px' }} onClick={() => navigate(`/pbl/${prev.key}`)}>← {prev.label}</button>}
                 {next && <button className="btn btn-secondary" style={{ padding: '11px 18px' }} onClick={() => navigate(`/pbl/${next.key}`)}>{next.label} →</button>}
-                <Link to="/pbl/info" style={{ marginLeft: 'auto', fontSize: '13.5px', color: 'var(--primary-blue)' }}>기본정보</Link>
+                <Link to="/pbl/info" style={{ marginLeft: 'auto', fontSize: '13.5px', color: 'var(--primary-blue)' }}>기본정보·내 점수</Link>
               </div>
             </>
           )}

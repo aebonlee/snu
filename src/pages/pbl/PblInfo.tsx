@@ -5,8 +5,8 @@ import { useToast } from '../../contexts/ToastContext';
 import SEOHead from '../../components/SEOHead';
 import { REGIONS, topicsByRegion, type Region } from '../../data/projectTopics';
 import { TRACKS } from '../../utils/projectTeams';
-import { PBL_STAGES } from '../../config/pblActivity';
-import { getMySubmission, saveInfo } from '../../utils/pblStore';
+import { PBL_STAGES, PBL_TOTAL, autoTotal, autoStagePoints } from '../../config/pblActivity';
+import { getMySubmission, saveInfo, type PblSubmission } from '../../utils/pblStore';
 
 const input: React.CSSProperties = {
   width: '100%', padding: '11px 13px', fontSize: '15px', boxSizing: 'border-box',
@@ -21,9 +21,11 @@ const PblInfo = (): ReactElement => {
   const [form, setForm] = useState({ student_name: '', team_name: '', region: '서울' as Region, topic_key: '', track: '기술' });
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [sub, setSub] = useState<PblSubmission | null>(null);
 
   const load = useCallback(async () => {
     const row = await getMySubmission(user);
+    setSub(row);
     if (row) {
       setForm({
         student_name: row.student_name || profile?.name || profile?.display_name || '',
@@ -102,11 +104,25 @@ const PblInfo = (): ReactElement => {
                 {saving ? '저장 중…' : '기본정보 저장'}
               </button>
 
-              {/* 단계 바로가기 */}
-              <div style={{ marginTop: '12px' }}>
+              {/* 내 점수 요약 */}
+              <div style={{ marginTop: '12px', padding: '18px 20px', borderRadius: '14px', background: 'var(--bg-light-gray)' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '15px', fontWeight: 800 }}>🤖 내 자동 평가 점수</span>
+                  <span style={{ fontSize: '28px', fontWeight: 900, color: 'var(--primary-blue)' }}>
+                    {autoTotal(sub?.auto)}<span style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>/{PBL_TOTAL}</span>
+                  </span>
+                  <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>각 단계에서 저장하면 합산됩니다.</span>
+                </div>
+              </div>
+
+              {/* 단계 바로가기 (단계별 점수 표시) */}
+              <div style={{ marginTop: '4px' }}>
                 <h3 style={{ fontSize: '16px', marginBottom: '10px' }}>PBL 활동 단계</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {PBL_STAGES.map((s, i) => (
+                  {PBL_STAGES.map((s, i) => {
+                    const a = sub?.auto?.[s.key];
+                    const teacher = sub?.scores?.[s.key];
+                    return (
                     <Link key={s.key} to={`/pbl/${s.key}`} style={{
                       display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px',
                       border: '1px solid var(--border-light)', borderRadius: '10px', textDecoration: 'none',
@@ -114,9 +130,14 @@ const PblInfo = (): ReactElement => {
                     }}>
                       <span style={{ fontSize: '18px' }}>{s.icon}</span>
                       <span style={{ fontWeight: 700 }}>{i + 1}. {s.label}</span>
-                      <span style={{ marginLeft: 'auto', fontSize: '12.5px', color: 'var(--text-secondary)' }}>{s.max}점</span>
+                      <span style={{ marginLeft: 'auto', fontSize: '12.5px', color: 'var(--text-secondary)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        {typeof a === 'number' && <span style={{ fontWeight: 700, color: s.color }}>자동 {autoStagePoints(a, s.max)}/{s.max}</span>}
+                        {typeof teacher === 'number' && <span style={{ fontWeight: 700, color: '#92400e' }}>강사 {teacher}/{s.max}</span>}
+                        {typeof a !== 'number' && typeof teacher !== 'number' && <span>{s.max}점</span>}
+                      </span>
                     </Link>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </>

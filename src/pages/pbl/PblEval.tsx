@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, type ReactElement } from 'react';
 import { useToast } from '../../contexts/ToastContext';
 import SEOHead from '../../components/SEOHead';
-import { PBL_STAGES, PBL_TOTAL, totalScore } from '../../config/pblActivity';
+import { PBL_STAGES, PBL_TOTAL, totalScore, autoTotal, autoStagePoints } from '../../config/pblActivity';
 import { getAllSubmissions, saveGrade, type PblSubmission } from '../../utils/pblStore';
 import { getTopic } from '../../data/projectTopics';
 
@@ -93,7 +93,7 @@ const PblEval = (): ReactElement => {
                     <p className="pgd-hero-subtitle">
                       팀 {sel.team_name || '-'} · {sel.region || '-'} · {sel.track || '-'} 트랙
                       {sel.topic_key && getTopic(sel.topic_key) && <> · {getTopic(sel.topic_key)!.title}</>}
-                      {' · '}합계 <strong>{totalScore(sel.scores)}/{PBL_TOTAL}점</strong>
+                      {' · '}🤖 자동 <strong>{autoTotal(sel.auto)}</strong> · 👩‍🏫 강사 <strong>{totalScore(sel.scores)}</strong> / {PBL_TOTAL}점
                     </p>
                   </div>
                 </div>
@@ -102,7 +102,9 @@ const PblEval = (): ReactElement => {
                   const content = sel.content?.[s.key] || {};
                   return (
                     <section key={s.key} className="pgd-section">
-                      <h2><span className="pgd-section-icon">{s.icon}</span> {i + 1}. {s.label} <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 400 }}>({s.max}점)</span></h2>
+                      <h2><span className="pgd-section-icon">{s.icon}</span> {i + 1}. {s.label} <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 400 }}>({s.max}점)</span>
+                        {typeof sel.auto?.[s.key] === 'number' && <span style={{ fontSize: '12.5px', fontWeight: 700, color: s.color, marginLeft: '8px' }}>🤖 자동 {autoStagePoints(sel.auto[s.key], s.max)}/{s.max} ({sel.auto[s.key]}/100)</span>}
+                      </h2>
                       <div className="pgd-card">
                         {/* 학생 작성 내용 */}
                         {s.fields.map((f) => (
