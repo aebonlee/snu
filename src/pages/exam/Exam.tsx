@@ -40,7 +40,8 @@ const Exam = (): ReactElement => {
 
   const total = exam.mcq.length;
   const results = exam.mcq.map((q, i) => ans[i] === q.answer);
-  const reveal = isPractice || checked;        // 정답·해설 공개 여부
+  // 정답·해설 공개: 자습은 해당 문항을 고른 뒤, 채점형은 제출 후
+  const rev = (i: number) => (isPractice ? ans[i] !== undefined : checked);
   const answeredCount = Object.keys(ans).length;
   const overLimit = !isPractice && attempts >= MAX_ATTEMPTS && !checked;
 
@@ -103,9 +104,9 @@ const Exam = (): ReactElement => {
               {exam.mcq.map((_, i) => {
                 const answered = ans[i] !== undefined;
                 let bg = 'var(--bg-light-gray)', col = 'var(--text-secondary)', bd = 'transparent';
-                if (reveal && answered) { const ok = results[i]; bg = ok ? '#d1fae5' : '#fee2e2'; col = ok ? '#065f46' : '#991b1b'; }
+                if (rev(i) && answered) { const ok = results[i]; bg = ok ? '#d1fae5' : '#fee2e2'; col = ok ? '#065f46' : '#991b1b'; }
                 else if (answered) { bg = exam.color; col = '#fff'; }
-                else if (reveal) { bd = '#fca5a5'; }
+                else if (!isPractice && checked) { bd = '#fca5a5'; }
                 return (
                   <button key={i} onClick={() => goTo(i)} title={`${i + 1}번`} style={{
                     height: '34px', borderRadius: '8px', border: `1px solid ${bd}`, cursor: 'pointer',
@@ -144,13 +145,13 @@ const Exam = (): ReactElement => {
           {exam.mcq.map((q, i) => {
             const ok = results[i];
             return (
-              <div id={`q-${i}`} key={i} style={{ padding: '16px 18px', border: `1px solid ${reveal && ans[i] !== undefined ? (ok ? '#a7f3d0' : '#fecaca') : 'var(--border-light)'}`, borderRadius: '12px', background: 'var(--bg-white)', scrollMarginTop: '90px' }}>
+              <div id={`q-${i}`} key={i} style={{ padding: '16px 18px', border: `1px solid ${rev(i) && ans[i] !== undefined ? (ok ? '#a7f3d0' : '#fecaca') : 'var(--border-light)'}`, borderRadius: '12px', background: 'var(--bg-white)', scrollMarginTop: '90px' }}>
                 <div style={{ fontWeight: 700, marginBottom: '10px' }}>{i + 1}. {q.q}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   {q.options.map((opt, oi) => {
                     const sel = ans[i] === oi;
-                    const isAnswer = reveal && oi === q.answer;
-                    const disabled = (overLimit) || (!isPractice && checked);
+                    const isAnswer = rev(i) && oi === q.answer;
+                    const disabled = overLimit || (!isPractice && checked);
                     return (
                       <label key={oi} style={{
                         display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px',
@@ -159,18 +160,17 @@ const Exam = (): ReactElement => {
                         border: `1px solid ${isAnswer ? '#10B981' : 'transparent'}`,
                       }}>
                         <input type="radio" name={`q-${i}`} checked={sel} disabled={disabled}
-                          onChange={() => { setAns({ ...ans, [i]: oi }); if (isPractice) { setChecked(true); } }} />
+                          onChange={() => setAns({ ...ans, [i]: oi })} />
                         <span style={{ fontSize: '14.5px' }}>{opt}</span>
                         {isAnswer && <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#059669', fontWeight: 700 }}>정답</span>}
                       </label>
                     );
                   })}
                 </div>
-                {reveal && ans[i] !== undefined && (
-                  <div style={{ marginTop: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>{ok ? '✅ 정답' : '❌ 오답'} · {q.explain}</div>
-                )}
-                {isPractice && ans[i] === undefined && (
-                  <div style={{ marginTop: '8px', fontSize: '12.5px', color: 'var(--text-secondary)' }}>정답: {q.options[q.answer]} · {q.explain}</div>
+                {rev(i) && ans[i] !== undefined && (
+                  <div style={{ marginTop: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                    {ok ? '✅ 정답입니다.' : `❌ 오답 · 정답: ${q.options[q.answer]}`} · {q.explain}
+                  </div>
                 )}
               </div>
             );
