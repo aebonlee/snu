@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import SEOHead from '../components/SEOHead';
-import { PRESET_TOPICS, type Region } from '../data/projectTopics';
 import {
   listCustomTopics, listVotes, addTopic, deleteTopic, castVote, retractVote,
   type CustomTopic, type TopicVote,
@@ -20,9 +19,6 @@ interface Row {
   description: string;
   isPreset: boolean;
   ownerId?: string;
-  region?: Region;
-  techTrack?: string;
-  humanTrack?: string;
 }
 
 const ProjectVote = (): ReactElement => {
@@ -62,12 +58,9 @@ const ProjectVote = (): ReactElement => {
   }, [votes]);
 
   const rows: Row[] = useMemo(() => {
-    const presetRows: Row[] = PRESET_TOPICS.map((t) => ({
-      key: t.key, title: t.title, description: t.description, isPreset: true,
-      region: t.region, techTrack: t.techTrack, humanTrack: t.humanTrack,
-    }));
+    // 학생이 직접 등록한 주제만 표시 (득표순)
     const customRows: Row[] = custom.map((c) => ({ key: c.id, title: c.title, description: c.description, isPreset: false, ownerId: c.created_by }));
-    return [...presetRows, ...customRows].sort((a, b) => (votersByKey[b.key]?.length || 0) - (votersByKey[a.key]?.length || 0));
+    return customRows.sort((a, b) => (votersByKey[b.key]?.length || 0) - (votersByKey[a.key]?.length || 0));
   }, [custom, votersByKey]);
 
   const members = (t: Team): TeamMember[] => (Array.isArray(t.members) ? t.members : []);
@@ -168,7 +161,7 @@ const ProjectVote = (): ReactElement => {
       <section className="page-header">
         <div className="container">
           <h2>팀구성 · 주제 투표</h2>
-          <p>서울·제주 지역문제 해결 주제 중 하나를 골라 팀을 구성합니다. <strong>7팀 × 4명(기술 2 + 인문 2)</strong> · 1인 1표</p>
+          <p>직접 프로젝트 주제를 등록하고 투표로 팀을 모은 뒤 팀장까지 정합니다. <strong>한 팀 {MAX_TEAM_SIZE}명(기술 {TRACK_CAP} · 인문 {TRACK_CAP})</strong> · 1인 1표</p>
         </div>
       </section>
 
@@ -205,6 +198,13 @@ const ProjectVote = (): ReactElement => {
                 </div>
               )}
 
+              {rows.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '36px 20px', border: '1px dashed var(--border-light)', borderRadius: '14px', color: 'var(--text-secondary)' }}>
+                  아직 등록된 주제가 없습니다.<br />
+                  아래 <strong>‘새 주제 제안’</strong>에서 직접 프로젝트 주제를 등록해 보세요. 등록 후 투표로 팀원을 모으고 팀장을 정합니다.
+                </div>
+              )}
+
               {rows.map((r, idx) => {
                 const voters = votersByKey[r.key] || [];
                 const mineVote = myVoteKey === r.key;
@@ -219,18 +219,11 @@ const ProjectVote = (): ReactElement => {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                           <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary-blue)' }}>{idx + 1}위</span>
-                          {r.region && <span style={chip(r.region === '서울' ? '#e0edff' : '#e6f4ee', r.region === '서울' ? '#0046C8' : '#00855A')}>{r.region}</span>}
                           <h3 style={{ margin: 0, fontSize: '17px' }}>{r.title}</h3>
-                          {!r.isPreset && <span style={chip('var(--bg-light-gray)', 'var(--text-secondary)')}>학생 제안</span>}
+                          <span style={chip('var(--bg-light-gray)', 'var(--text-secondary)')}>학생 제안</span>
                           {team && <span style={chip('#dbeafe', '#1e3a8a')}>팀 결성됨 {members(team).length}/{MAX_TEAM_SIZE}</span>}
                         </div>
-                        <p style={{ margin: '6px 0 0', fontSize: '14px', color: 'var(--text-secondary)' }}>{r.description}</p>
-                        {(r.techTrack || r.humanTrack) && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
-                            {r.techTrack && <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}><strong style={{ color: '#0046C8' }}>🛠️ 기술</strong> {r.techTrack}</div>}
-                            {r.humanTrack && <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}><strong style={{ color: '#00855A' }}>📖 인문</strong> {r.humanTrack}</div>}
-                          </div>
-                        )}
+                        {r.description && <p style={{ margin: '6px 0 0', fontSize: '14px', color: 'var(--text-secondary)' }}>{r.description}</p>}
                         {team && (
                           <div style={{ marginTop: '8px', fontSize: '12.5px', fontWeight: 700 }}>
                             <span style={{ color: '#0046C8' }}>기술 {trackCount(members(team), '기술')}/{TRACK_CAP}</span>
