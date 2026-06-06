@@ -90,6 +90,16 @@ const site: SiteConfig = {
         { path: '/projects/apps', labelKey: 'site.nav.projectApps' },
       ]
     },
+    {
+      labelKey: 'site.nav.exam',
+      path: '/exam',
+      activePath: '/exam',
+      dropdown: [
+        { path: '/exam/prerequisite', labelKey: 'site.nav.examPre' },
+        { path: '/exam/diagnostic', labelKey: 'site.nav.examDiag' },
+        { path: '/exam/summative', labelKey: 'site.nav.examPost' },
+      ]
+    },
     { path: '/resources', labelKey: 'site.nav.resources' },
     {
       labelKey: 'site.nav.lms',

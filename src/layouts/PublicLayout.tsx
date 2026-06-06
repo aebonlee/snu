@@ -21,6 +21,8 @@ const ProjectGuide = lazy(() => import('../pages/ProjectGuide'));
 const ProjectBuild = lazy(() => import('../pages/ProjectBuild'));
 const ProjectBoard = lazy(() => import('../pages/ProjectBoard'));
 const ProjectVote = lazy(() => import('../pages/ProjectVote'));
+const ExamList = lazy(() => import('../pages/exam/ExamList'));
+const Exam = lazy(() => import('../pages/exam/Exam'));
 const PblInfo = lazy(() => import('../pages/pbl/PblInfo'));
 const PblStage = lazy(() => import('../pages/pbl/PblStage'));
 const PblEval = lazy(() => import('../pages/pbl/PblEval'));
@@ -92,6 +94,10 @@ const PublicLayout = (): ReactElement => {
             <Route path="/project-vote" element={<AuthGuard><ProjectVote /></AuthGuard>} />
             <Route path="/project-teams" element={<Navigate to="/project-vote" replace />} />
             <Route path="/project-board" element={<AuthGuard><ProjectBoard /></AuthGuard>} />
+
+            {/* 평가 */}
+            <Route path="/exam" element={<AuthGuard><ExamList /></AuthGuard>} />
+            <Route path="/exam/:type" element={<AuthGuard><Exam /></AuthGuard>} />
 
             {/* PBL 활동 */}
             <Route path="/pbl" element={<Navigate to="/pbl/info" replace />} />

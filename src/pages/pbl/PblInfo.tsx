@@ -84,7 +84,7 @@ const PblInfo = (): ReactElement => {
       <div className="sidebar-layout">
         <PblSidebar active="info" auto={sub?.auto} scores={sub?.scores} />
 
-        <div className="sidebar-content" style={{ display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '720px' }}>
+        <div className="sidebar-content" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           {!loaded ? (
             <div style={{ textAlign: 'center', padding: '40px' }}><div className="loading-spinner" style={{ margin: '0 auto' }} /></div>
           ) : (
