@@ -197,18 +197,18 @@ const PblInfo = (): ReactElement => {
 
                 <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'stretch' }}>
                   {/* 좌측 2/3 — 항목별 막대 */}
-                  <div style={{ flex: '2 1 360px', minWidth: 0, paddingRight: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ flex: '2 1 360px', minWidth: 0, paddingRight: '44px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {PBL_STAGES.map((s, i) => {
                       const a = sub?.auto?.[s.key];
                       const t = sub?.scores?.[s.key];
                       const pts = typeof a === 'number' ? autoStagePoints(a, s.max) : 0;
                       return (
-                        <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ flex: '0 0 230px', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.icon} {i + 1}. {s.label}</span>
                           <div style={{ flex: '1 1 60px', height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
                             <div style={{ width: `${(pts / s.max) * 100}%`, height: '100%', background: s.color, transition: 'width .3s' }} />
                           </div>
-                          <span style={{ flex: '0 0 108px', textAlign: 'right', fontSize: '12.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                          <span style={{ flex: '0 0 auto', textAlign: 'left', fontSize: '12.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
                             {typeof a === 'number' ? <span style={{ color: s.color }}>{pts}/{s.max}</span> : <span style={{ color: 'var(--text-secondary)' }}>미작성</span>}
                             {typeof t === 'number' && <span style={{ color: '#92400e' }}> · 강사 {t}</span>}
                           </span>
