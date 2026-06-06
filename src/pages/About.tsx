@@ -29,7 +29,7 @@ const REASONS: ReasonItem[] = [
   {
     emoji: '🤝',
     title: '교육 종료 후에도 이어집니다',
-    desc: '강사의 회사(DreamIT Biz)가 지속적으로 사이트를 운영합니다. 단발성 강의가 아닌, 수강 이후의 커뮤니티·후속 코칭·경진대회 출품까지 함께 갑니다.',
+    desc: '강사의 회사(DreamIT Biz)가 지속적으로 사이트를 운영합니다. 단발성 강의가 아닌, 수강 이후의 커뮤니티·후속 코칭·해커톤 연계까지 함께 갑니다.',
   },
 ];
 
@@ -75,7 +75,7 @@ export default function About(): ReactElement {
   return (
     <>
       <SEOHead
-        title="회사소개 | AI Reboot Academy"
+        title="회사소개 | SNU PBL"
         description="본 사이트는 강사의 소속 회사 드림아이티비즈(DreamIT Biz)가 운영합니다. 회사 대표인 이애본 박사가 본 과정의 총괄 책임교수로 참여하며, 강의 운영을 위해 직접 사이트를 설계·개발했습니다."
         path="/about"
       />
@@ -111,7 +111,7 @@ export default function About(): ReactElement {
               본 사이트는 강사의 회사가 직접 운영합니다.
             </h2>
             <p style={{ margin: 0, fontSize: '16px' }}>
-              <strong>AI Reboot Academy</strong>는 본 과정의 총괄 책임교수인 <strong>이애본 박사</strong>가 대표로 있는{' '}
+              본 <strong>서울대학교 PBL</strong> 과정은 총괄 책임교수인 <strong>이애본 박사</strong>가 대표로 있는{' '}
               <strong>드림아이티비즈(DreamIT Biz)</strong>가 운영합니다. 강사가 본 과정을 진행하기 위해
               직접 기획·설계·개발한 사이트로, 강의 자료·과제·평가·팀 프로젝트가 하나의 LMS로 통합되어 있습니다.
               따라서 회사 소개는 곧 <strong>본 강의의 운영 주체와 강사의 배경</strong>을 함께 설명하는 페이지입니다.

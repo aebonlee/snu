@@ -159,7 +159,7 @@ const ProjectGuide = (): ReactElement => {
       <section className="page-header">
         <div className="container">
           <h2>프로젝트 안내</h2>
-          <p>AI 리부트 경진대회를 위한 7가지 프로젝트 가이드입니다. Solar LLM을 활용한 실전 프로젝트를 확인하세요.</p>
+          <p>지역문제 해결형 PBL 프로젝트의 참고 가이드입니다. 생성형 AI를 활용한 실전 프로젝트 사례를 살펴보고 팀 산출물 설계에 참고하세요.</p>
         </div>
       </section>
 
