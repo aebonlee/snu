@@ -3,6 +3,14 @@ import { Link } from 'react-router-dom';
 import type { ReactElement } from 'react';
 import site from '../config/site';
 
+const COURSE_OBJECTIVES: string[] = [
+  'ESG 관점의 사회·환경 문제를 이해하고 설명할 수 있다.',
+  '공공·산업 데이터를 활용해 문제를 구조화하고 타당하게 정의할 수 있다.',
+  '생성형 AI의 가능성과 한계를 이해하고 문제 해결에 적절히 활용할 수 있다.',
+  '데이터 프로젝트 전 주기를 수행하고 결과를 해석·전달할 수 있다.',
+  '팀 기반 프로젝트를 통해 협업과 융합형 문제 해결 역량을 함양한다.',
+];
+
 interface ReasonItem {
   emoji: string;
   title: string;
@@ -89,6 +97,69 @@ export default function About(): ReactElement {
 
       <section className="section" style={{ padding: '60px 0' }}>
         <div className="container">
+
+          {/* ───── 교과목 개요 (ESG 캡스톤) ───── */}
+          <div style={{
+            background: 'var(--bg-card, #fff)',
+            border: '1px solid var(--border-color, #e5e7eb)',
+            borderTop: '4px solid #00855A',
+            padding: '32px 36px',
+            borderRadius: '12px',
+            marginBottom: '32px',
+            lineHeight: 1.85,
+            color: 'var(--text-primary, #1a1a1a)',
+          }}>
+            <p style={{ fontSize: '15px', fontWeight: 700, letterSpacing: '0.1em', color: '#00855A', margin: '0 0 12px' }}>
+              COURSE OVERVIEW
+            </p>
+            <h2 style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 16px' }}>
+              교과목 개요 — ESG 기반 데이터 캡스톤 디자인
+            </h2>
+            <p style={{ margin: '0 0 14px', fontSize: '16px' }}>
+              본 교과목은 <strong>빅데이터 혁신공유대학(COSS) 데이터 창업 마이크로디그리(MD)</strong>에 포함된 교과목으로,
+              환경·사회·투명 경영(<strong>ESG</strong>) 관점의 사회·환경 문제를 주제로 실제 산업 및 사회에서 요구되는 문제를
+              <strong> 데이터 기반으로 정의·분석</strong>하고, <strong>생성형 AI</strong>를 활용해 해결하는
+              교양 기반 캡스톤 디자인 수업입니다.
+            </p>
+            <p style={{ margin: 0, fontSize: '16px' }}>
+              <strong>전공에 관계없이</strong> 참여할 수 있으며, 프로젝트 기반 학습(<strong>PBL</strong>)을 통해
+              문제 정의부터 결과물 도출까지 전 과정을 수행합니다. 기술 트랙과 인문 트랙이 융합해
+              제주국제 생태포럼 해커톤 등 비교과 프로그램과 연계합니다.
+            </p>
+          </div>
+
+          {/* ───── 수업 목표 ───── */}
+          <h3 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '20px', color: 'var(--text-primary, #1a1a1a)' }}>
+            <span style={{ borderLeft: '4px solid #00855A', paddingLeft: '12px' }}>수업 목표</span>
+          </h3>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '16px',
+            marginBottom: '56px',
+          }}>
+            {COURSE_OBJECTIVES.map((obj, i) => (
+              <div key={i} style={{
+                display: 'flex',
+                gap: '14px',
+                padding: '20px 22px',
+                background: 'var(--bg-card, #fff)',
+                border: '1px solid var(--border-color, #e5e7eb)',
+                borderRadius: '12px',
+                lineHeight: 1.6,
+              }}>
+                <span style={{
+                  flexShrink: 0,
+                  width: '28px', height: '28px',
+                  borderRadius: '50%',
+                  background: '#e6f4ee', color: '#00855A',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '14px', fontWeight: 800,
+                }}>{i + 1}</span>
+                <span style={{ fontSize: '15.5px', color: 'var(--text-primary, #1a1a1a)' }}>{obj}</span>
+              </div>
+            ))}
+          </div>
 
           {/* ───── 이 사이트에 대해 (운영 주체 명시) ───── */}
           <div style={{
