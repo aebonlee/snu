@@ -9,7 +9,7 @@ const site: SiteConfig = {
   id: 'snu',
   name: 'SNU PBL',
   nameKo: '서울대학교 PBL',
-  description: '서울대학교 하계 계절학기 PBL — 교과·비교과·제주국제 생태포럼 해커톤 연계 프로젝트 기반 학습',
+  description: '서울대학교 하계 계절학기 PBL — 빅데이터 혁신공유대학(COSS) 데이터 창업 MD. ESG·환경 문제를 데이터·생성형 AI로 해결하는 융합형 캡스톤 디자인 (기술·인문 2트랙, 제주국제 생태포럼 해커톤 연계)',
   url: 'https://snu.dreamitbiz.com',
   dbPrefix: 'snu_',
   parentSite: {

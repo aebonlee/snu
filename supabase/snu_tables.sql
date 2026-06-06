@@ -384,3 +384,55 @@ ON CONFLICT (no) DO UPDATE SET
     date=EXCLUDED.date, weekday=EXCLUDED.weekday, time=EXCLUDED.time,
     title=EXCLUDED.title, topics=EXCLUDED.topics, instructor=EXCLUDED.instructor,
     mode=EXCLUDED.mode, mode_label=EXCLUDED.mode_label, updated_at=now();
+
+-- ============================================
+-- 팀 게시판 확장 (snu_team_posts / snu_team_comments)
+-- ============================================
+CREATE TABLE IF NOT EXISTS snu_team_comments (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    post_id UUID REFERENCES snu_team_posts(id) ON DELETE CASCADE,
+    team_id UUID REFERENCES snu_teams(id) ON DELETE CASCADE,
+    author_id UUID REFERENCES auth.users(id),
+    author_name TEXT DEFAULT '',
+    content TEXT NOT NULL,
+    is_staff BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE snu_team_comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE snu_team_posts ADD COLUMN IF NOT EXISTS link_url TEXT DEFAULT '';
+
+-- 댓글 조회: 팀원 또는 운영자
+DROP POLICY IF EXISTS "snu_team_comments_select" ON snu_team_comments;
+CREATE POLICY "snu_team_comments_select" ON snu_team_comments FOR SELECT
+  USING (
+    EXISTS (SELECT 1 FROM snu_teams t WHERE t.id = snu_team_comments.team_id
+            AND t.members @> jsonb_build_array(jsonb_build_object('id',(auth.uid())::text)))
+    OR (auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr')
+  );
+
+-- 댓글 작성: 팀원 또는 운영자
+DROP POLICY IF EXISTS "snu_team_comments_insert" ON snu_team_comments;
+CREATE POLICY "snu_team_comments_insert" ON snu_team_comments FOR INSERT
+  WITH CHECK (auth.uid() = author_id AND (
+    EXISTS (SELECT 1 FROM snu_teams t WHERE t.id = snu_team_comments.team_id
+            AND t.members @> jsonb_build_array(jsonb_build_object('id',(auth.uid())::text)))
+    OR (auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr')));
+
+-- 글 수정: 작성자 또는 운영자
+DROP POLICY IF EXISTS "snu_team_posts_update" ON snu_team_posts;
+CREATE POLICY "snu_team_posts_update" ON snu_team_posts FOR UPDATE
+  USING (auth.uid() = author_id OR (auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr'))
+  WITH CHECK (auth.uid() = author_id OR (auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr'));
+
+-- 글 작성: 팀원 또는 운영자
+DROP POLICY IF EXISTS "snu_team_posts_insert" ON snu_team_posts;
+CREATE POLICY "snu_team_posts_insert" ON snu_team_posts FOR INSERT
+  WITH CHECK (auth.uid() = author_id AND (
+    EXISTS (SELECT 1 FROM snu_teams t WHERE t.id = snu_team_posts.team_id
+            AND t.members @> jsonb_build_array(jsonb_build_object('id',(auth.uid())::text)))
+    OR (auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr')));
+
+-- 팀 삭제: 운영자
+DROP POLICY IF EXISTS "snu_teams_delete" ON snu_teams;
+CREATE POLICY "snu_teams_delete" ON snu_teams FOR DELETE
+  USING ((auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr'));

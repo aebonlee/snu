@@ -152,6 +152,27 @@ const ProjectGuide = (): ReactElement => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  if (!project) {
+    return (
+      <>
+        <SEOHead title="프로젝트 안내" path="/project-guide" />
+        <section className="page-header">
+          <div className="container">
+            <h2>프로젝트 안내</h2>
+            <p>지역문제 해결형 PBL 프로젝트 가이드는 준비 중입니다.</p>
+          </div>
+        </section>
+        <section className="section">
+          <div className="container">
+            <p style={{ color: 'var(--text-secondary, #6b7280)' }}>
+              기술·인문 트랙 팀 프로젝트 가이드가 곧 제공됩니다. 강의 일정은 <a href="/schedule">강의 일정</a>에서 확인하세요.
+            </p>
+          </div>
+        </section>
+      </>
+    );
+  }
+
   return (
     <>
       <SEOHead title={project.title} path={`/project-guide/${selectedId}`} />

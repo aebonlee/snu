@@ -1,7 +1,7 @@
 /**
  * 프로젝트 팀 구성 + 팀별 게시판 유틸
- *  - 팀: rest_teams (members JSONB = TeamMember[])
- *  - 게시판: rest_team_posts (팀별 비공개 — RLS로 팀원+관리자만)
+ *  - 팀: snu_teams (members JSONB = TeamMember[])
+ *  - 게시판: snu_team_posts (팀별 비공개 — RLS로 팀원+관리자만)
  */
 import getSupabase from './supabase';
 import site from '../config/site';

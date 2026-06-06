@@ -10,6 +10,13 @@ import type { ReactElement } from 'react';
 
 const offlineCount = SNU_SESSIONS.length - ONLINE_SESSION_NOS.length;
 
+const domains = [
+  { icon: '🌱', title: '탄소중립', desc: 'RE100 및 에너지 효율화 아이디어·구현' },
+  { icon: '💧', title: '환경오염', desc: '대기·수질 환경 개선, 생활 밀착형 환경 문제 해결' },
+  { icon: '🦺', title: '안전', desc: '중대재해처벌법 관련 산업·노동 안전 솔루션' },
+  { icon: '♻️', title: '자원순환', desc: '해양 쓰레기 및 폐기물 문제 해결' },
+];
+
 const tracks = [
   {
     icon: '🛠️',
@@ -28,10 +35,12 @@ const tracks = [
 ];
 
 const phases = [
-  { n: 1, color: '#10B981', title: '문제정의 (1~5회차)', desc: '지역 이해 · 데이터 탐색 · 생성형 AI 기반 문제정의 · 트랙별 방법론' },
-  { n: 2, color: '#3B82F6', title: '중간 설계 (6~8회차)', desc: '중간 설계 발표 · 피드백 · 주제·데이터·역할 확정' },
-  { n: 3, color: '#6B21A8', title: '프로젝트 실행 (9~13회차)', desc: '데이터 분석·구현 · 생성형 AI 고도화 · 결과 통합·고도화' },
-  { n: 4, color: '#0D2B5E', title: '해커톤 연계 (14~15회차)', desc: '모의 해커톤 발표 · 최종 발표 · 제주국제 생태포럼 해커톤 후속 연계' },
+  { n: 1, color: '#10B981', title: '문제정의 및 아이디어 도출', desc: 'ESG·환경 관점에서 사회·환경 문제 탐색, 생성형 AI 기반 문제정의' },
+  { n: 2, color: '#22A06B', title: '팀 빌딩 및 아이디어 구체화', desc: '기술·인문 융합 팀 구성, 주제·데이터·역할 확정' },
+  { n: 3, color: '#3B82F6', title: '심사 및 평가', desc: '중간 설계 발표 · 문제정의·데이터 활용 가능성 검토 · 피드백' },
+  { n: 4, color: '#6B21A8', title: '팀별 컨설팅 및 기술 멘토링', desc: '트랙별 방법론 코칭, 분석·구현 방향 멘토링' },
+  { n: 5, color: '#9333EA', title: '기술 기반 아이디어 구현', desc: '데이터 분석·시각화·프로토타입 구현, 생성형 AI 활용 고도화' },
+  { n: 6, color: '#0D2B5E', title: '결과물 고도화 및 최종 발표', desc: '결과보고서·피치덱 완성 · 모의 해커톤 · 제주국제 생태포럼 해커톤 연계' },
 ];
 
 const Home = (): ReactElement => {
@@ -62,8 +71,9 @@ const Home = (): ReactElement => {
               <span className="title-line"><span className="highlight">PBL · 지역문제 해결 프로젝트</span></span>
             </h1>
             <p className="hero-description">
-              교과 · 비교과 · 제주국제 생태포럼 해커톤을 연계하여, 기술 트랙과 인문 트랙으로
-              지역문제 해결형 프로젝트를 수행합니다.
+              빅데이터 혁신공유대학(COSS) 데이터 창업 MD 교과목. ESG 관점의 사회·환경 문제를
+              데이터로 정의·분석하고 생성형 AI로 해결하는, 전공 무관 융합형 캡스톤 디자인.
+              기술·인문 2개 트랙으로 운영하며 제주국제 생태포럼 해커톤과 연계합니다.
             </p>
             <div className="hero-info-cards">
               <div className="hero-info-card">
@@ -111,12 +121,31 @@ const Home = (): ReactElement => {
         </div>
       </section>
 
-      {/* 프로젝트 진행 단계 */}
+      {/* ESG 주제 분야 (학생 선택형) */}
       <section className="section section-alt">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">프로젝트 진행 단계</h2>
-            <p className="section-subtitle">문제정의 → 중간설계 → 실행 → 해커톤 연계의 흐름으로 산출물을 완성합니다.</p>
+            <h2 className="section-title">ESG · 환경 주제 분야 (학생 선택형)</h2>
+            <p className="section-subtitle">사회·환경 문제 해결형 프로젝트 — 관심 주제를 선택해 팀 프로젝트를 설계합니다.</p>
+          </div>
+          <div className="course-cards">
+            {domains.map((d) => (
+              <div key={d.title} className="course-card" style={{ borderTopColor: '#00855A' }}>
+                <div className="course-card-icon">{d.icon}</div>
+                <h3 className="course-card-title">{d.title}</h3>
+                <p className="course-card-desc">{d.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 프로젝트 진행 단계 */}
+      <section className="section">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">PBL 운영 단계</h2>
+            <p className="section-subtitle">문제정의·아이디어 도출부터 결과물 고도화·최종 발표까지 6단계로 진행합니다.</p>
           </div>
           <div className="project-timeline">
             {phases.map((p) => (

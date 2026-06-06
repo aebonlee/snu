@@ -1,5 +1,5 @@
 /**
- * 학습평가 성적 저장/조회 — rest_assessments 테이블
+ * 학습평가 성적 저장/조회 — snu_assessments 테이블
  * 채점형 평가(선수평가·사후평가)만 대상. 진단평가는 자습용이라 저장하지 않음.
  */
 import getSupabase from './supabase';

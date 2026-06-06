@@ -1,7 +1,7 @@
 /**
  * 프로젝트 주제 투표 유틸
- *  - 추가 주제: rest_project_topics (학생이 새로 제안한 주제)
- *  - 투표: rest_topic_votes (1인 1표, UNIQUE(user_id) — 재투표 시 변경)
+ *  - 추가 주제: snu_project_topics (학생이 새로 제안한 주제)
+ *  - 투표: snu_topic_votes (1인 1표, UNIQUE(user_id) — 재투표 시 변경)
  *  - topic_key: 프리셋은 'p1'~'p7', 추가 주제는 해당 행 id(UUID)
  */
 import getSupabase from './supabase';

@@ -121,7 +121,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '최종 산출물 유형 결정',
       '프로젝트 추진 일정 확정',
     ],
-    instructor: null, mode: 'offline-fixed', modeLabel: '중간고사(오프라인 고정)',
+    instructor: '이애본', mode: 'offline-fixed', modeLabel: '중간고사(오프라인 고정)',
   },
   {
     no: 9, date: '2026-07-13', weekday: '월', time: COURSE_TIME,
@@ -196,7 +196,7 @@ export const SNU_SESSIONS: SnuSession[] = [
       '수업 성찰 및 향후 확장 방향 정리',
       '비교과 프로그램 및 해커톤 후속 안내',
     ],
-    instructor: null, mode: 'offline-fixed', modeLabel: '기말고사(오프라인 고정)',
+    instructor: '이애본', mode: 'offline-fixed', modeLabel: '기말고사(오프라인 고정)',
   },
 ];
 
