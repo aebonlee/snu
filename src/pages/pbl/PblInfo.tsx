@@ -195,24 +195,50 @@ const PblInfo = (): ReactElement => {
                   <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>각 단계에서 저장하면 합산됩니다.</span>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {PBL_STAGES.map((s, i) => {
-                    const a = sub?.auto?.[s.key];
-                    const t = sub?.scores?.[s.key];
-                    const pts = typeof a === 'number' ? autoStagePoints(a, s.max) : 0;
-                    return (
-                      <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{ flex: '0 0 240px', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.icon} {i + 1}. {s.label}</span>
-                        <div style={{ flex: '1 1 80px', maxWidth: '160px', height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
-                          <div style={{ width: `${(pts / s.max) * 100}%`, height: '100%', background: s.color, transition: 'width .3s' }} />
+                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'stretch' }}>
+                  {/* 좌측 2/3 — 항목별 막대 */}
+                  <div style={{ flex: '2 1 360px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {PBL_STAGES.map((s, i) => {
+                      const a = sub?.auto?.[s.key];
+                      const t = sub?.scores?.[s.key];
+                      const pts = typeof a === 'number' ? autoStagePoints(a, s.max) : 0;
+                      return (
+                        <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <span style={{ flex: '0 0 230px', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.icon} {i + 1}. {s.label}</span>
+                          <div style={{ flex: '1 1 60px', height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
+                            <div style={{ width: `${(pts / s.max) * 100}%`, height: '100%', background: s.color, transition: 'width .3s' }} />
+                          </div>
+                          <span style={{ flex: '0 0 108px', textAlign: 'right', fontSize: '12.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                            {typeof a === 'number' ? <span style={{ color: s.color }}>{pts}/{s.max}</span> : <span style={{ color: 'var(--text-secondary)' }}>미작성</span>}
+                            {typeof t === 'number' && <span style={{ color: '#92400e' }}> · 강사 {t}</span>}
+                          </span>
                         </div>
-                        <span style={{ flex: '0 0 110px', textAlign: 'right', fontSize: '12.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                          {typeof a === 'number' ? <span style={{ color: s.color }}>{pts}/{s.max}</span> : <span style={{ color: 'var(--text-secondary)' }}>미작성</span>}
-                          {typeof t === 'number' && <span style={{ color: '#92400e' }}> · 강사 {t}</span>}
-                        </span>
+                      );
+                    })}
+                  </div>
+
+                  {/* 우측 1/3 — 격려 메시지 */}
+                  {(() => {
+                    const total = autoTotal(sub?.auto);
+                    const done = PBL_STAGES.filter((s) => typeof sub?.auto?.[s.key] === 'number').length;
+                    const pct = Math.round((total / PBL_TOTAL) * 100);
+                    let emoji = '🌱', title = '지금 시작해 볼까요?', msg = '첫 단계부터 작성하면 점수가 쌓입니다. 가볍게 한 줄부터 시작해요.';
+                    if (total > 0 && total < 40) { emoji = '🚶'; title = '좋은 출발이에요!'; msg = '한 단계씩 채워가면 됩니다. 구체적인 예시를 넣으면 점수가 더 올라요.'; }
+                    else if (total < 70) { emoji = '🔥'; title = '잘하고 있어요!'; msg = '절반을 넘겼어요. 숫자·근거·구조를 보강하면 점수가 쑥 오릅니다.'; }
+                    else if (total < 90) { emoji = '🚀'; title = '거의 다 왔어요!'; msg = '완성도가 높아요. 마무리 단계만 다듬으면 최상위권입니다.'; }
+                    else { emoji = '🏆'; title = '훌륭해요!'; msg = '완벽에 가까운 점수예요. 표현을 조금만 더 다듬어 마무리하세요. 👏'; }
+                    return (
+                      <div style={{ flex: '1 1 220px', minWidth: 200, borderRadius: '12px', padding: '18px 18px', background: 'var(--primary-gradient, #0d2b5e)', color: '#fff', display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center' }}>
+                        <div style={{ fontSize: '30px' }}>{emoji}</div>
+                        <div style={{ fontSize: '16px', fontWeight: 800 }}>{title}</div>
+                        <div style={{ fontSize: '13px', lineHeight: 1.6, opacity: 0.95 }}>{msg}</div>
+                        <div style={{ marginTop: '4px', fontSize: '12px', opacity: 0.9 }}>진행 {done}/{PBL_STAGES.length}단계 · 달성 {pct}%</div>
+                        <div style={{ height: '8px', borderRadius: '4px', background: 'rgba(255,255,255,0.25)', overflow: 'hidden' }}>
+                          <div style={{ width: `${pct}%`, height: '100%', background: '#fff', transition: 'width .3s' }} />
+                        </div>
                       </div>
                     );
-                  })}
+                  })()}
                 </div>
               </div>
             </>
