@@ -495,6 +495,9 @@ CREATE TABLE IF NOT EXISTS snu_pbl_submissions (
     region TEXT DEFAULT '',
     topic_key TEXT DEFAULT '',
     track TEXT DEFAULT '',
+    student_no TEXT DEFAULT '',
+    major TEXT DEFAULT '',
+    phone TEXT DEFAULT '',
     content JSONB NOT NULL DEFAULT '{}'::jsonb,
     auto JSONB NOT NULL DEFAULT '{}'::jsonb,
     scores JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -521,3 +524,15 @@ CREATE POLICY "snu_pbl_update" ON snu_pbl_submissions FOR UPDATE
 DROP POLICY IF EXISTS "snu_pbl_delete" ON snu_pbl_submissions;
 CREATE POLICY "snu_pbl_delete" ON snu_pbl_submissions FOR DELETE
   USING ((auth.jwt() ->> 'email') IN ('aebon@kakao.com','radical8566@gmail.com','aebon@kyonggi.ac.kr'));
+
+-- ============================================
+-- 추가 컬럼 동기화 (기존 DB 대비 멱등) — PBL/회원 추가 컬럼
+-- ============================================
+ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS auto JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS student_no TEXT DEFAULT '';
+ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS major TEXT DEFAULT '';
+ALTER TABLE snu_pbl_submissions ADD COLUMN IF NOT EXISTS phone TEXT DEFAULT '';
+
+-- 공유 회원 테이블(user_profiles)에 학번·전공 추가 (additive, 다른 사이트 무영향)
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS student_no TEXT;
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS major TEXT;
