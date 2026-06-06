@@ -89,7 +89,7 @@ const Exam = (): ReactElement => {
       <section className="page-header">
         <div className="container">
           <h2>{exam.icon} {exam.title} <span style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>· {exam.subtitle}</span></h2>
-          <p>{exam.desc} · 객관식 {total}문항{!isPractice && ` · 통과 ${PASS_SCORE}점`}</p>
+          <p>{exam.desc} · 객관식 {total}문항{!isPractice && ` · 목표 ${PASS_SCORE}점 (성적 미반영)`}</p>
         </div>
       </section>
 

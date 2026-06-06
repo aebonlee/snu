@@ -15,7 +15,7 @@ const PblSidebar = ({ active, auto, scores }: Props): ReactElement => (
     <nav className="sidebar-menu">
       <Link to="/pbl/info" className={`sidebar-item ${active === 'info' ? 'active' : ''}`} style={linkStyle}>
         <span className="sidebar-item-icon">📋</span>
-        <span className="sidebar-item-text">기본정보</span>
+        <span className="sidebar-item-text">기본정보 &amp; 평가점수</span>
       </Link>
 
       {PBL_STAGES.map((s, i) => {

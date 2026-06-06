@@ -21,8 +21,8 @@ const ExamList = (): ReactElement => {
       <SEOHead title="평가" path="/exam" noindex />
       <section className="page-header">
         <div className="container">
-          <h2>평가</h2>
-          <p>사전·진단·사후 평가 — 객관식과 단답형으로 구성되며, 제출하면 자동 채점되어 점수가 저장됩니다.</p>
+          <h2>자가평가</h2>
+          <p>사전·진단·사후 — 학습자가 스스로 이해도를 점검하는 자가평가입니다. <strong>성적에는 반영되지 않으며</strong>, 본인 점수 확인·복습 용도로 활용하세요.</p>
         </div>
       </section>
 
@@ -49,7 +49,7 @@ const ExamList = (): ReactElement => {
                 ) : r ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '13px', fontWeight: 800, padding: '3px 12px', borderRadius: '999px', background: r.passed ? '#d1fae5' : '#fee2e2', color: r.passed ? '#065f46' : '#991b1b' }}>
-                      내 점수 {r.score}점 {r.passed ? '· 통과' : ''}
+                      내 점수 {r.score}점 {r.passed ? '· 목표 달성' : ''}
                     </span>
                     <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>응시 {r.attempts ?? 0}/{MAX_ATTEMPTS}</span>
                     {(r.attempts ?? 0) < MAX_ATTEMPTS && <Link to={`/exam/${e.type}`} style={{ fontSize: '13.5px', color: e.color, fontWeight: 700 }}>다시 응시 →</Link>}

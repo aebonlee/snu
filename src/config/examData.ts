@@ -98,11 +98,11 @@ const POST: MCQ[] = [
 
 export const EXAMS: Exam[] = [
   { type: 'prerequisite', mode: 'graded', title: '사전평가', subtitle: '준비도 확인', icon: '📋', color: '#10B981',
-    desc: '수업 시작 전 ESG·데이터·생성형 AI 기초 준비도를 확인합니다. (채점·저장, 응시 3회)', mcq: PRE },
+    desc: '수업 시작 전 ESG·데이터·생성형 AI 기초 준비도를 확인합니다. (자가 점검 · 성적 미반영 · 응시 3회)', mcq: PRE },
   { type: 'diagnostic', mode: 'practice', title: '진단평가', subtitle: '수업 중 자습', icon: '🩺', color: '#3B82F6',
     desc: '사후평가 전 자습용입니다. 정답·해설이 공개되어 있고 성적에는 반영되지 않습니다.', mcq: DIAG },
   { type: 'summative', mode: 'graded', title: '사후평가', subtitle: '최종 성취도', icon: '🏆', color: '#0D2B5E',
-    desc: '프로젝트 종료 후 전 과정의 성취도를 평가합니다. (채점·저장, 응시 3회)', mcq: POST },
+    desc: '프로젝트 종료 후 전 과정의 성취도를 평가합니다. (자가 점검 · 성적 미반영 · 응시 3회)', mcq: POST },
 ];
 
 export const examByType = (type: string): Exam | undefined => EXAMS.find((e) => e.type === type);
