@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 import { SNU_SESSIONS, MODE_LABEL, type SnuSession } from '../config/snuSchedule';
 import { planByNo } from '../config/lessonPlans';
+import { contentByNo } from '../config/lessonContent';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 const dayLabel = (no: number) => `Day${pad2(no)}`;
@@ -53,6 +54,7 @@ const Lessons = (): ReactElement => {
   }
 
   const plan = planByNo(session.no);
+  const content = contentByNo(session.no);
   const color = modeColor[session.mode] || '#0046C8';
 
   return (
@@ -116,6 +118,44 @@ const Lessons = (): ReactElement => {
               {session.topics.map((t, i) => <li key={i}>{t}</li>)}
             </ul>
           </Section>
+
+          {/* 3시간 강의 내용 (강의안 본문) */}
+          {content && (
+            <section className="pgd-section">
+              <h2><span className="pgd-section-icon">📖</span> 강의 내용 (3시간)</h2>
+              <div className="pgd-card" style={{ marginBottom: '14px' }}>
+                <p style={{ margin: '0 0 10px', lineHeight: 1.75 }}>{content.overview}</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {content.keywords.map((k) => (
+                    <span key={k} style={{ fontSize: '12.5px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: `${color}14`, color }}>#{k}</span>
+                  ))}
+                </div>
+              </div>
+
+              {content.sections.map((sec, si) => (
+                <div key={si} style={{ border: '1px solid var(--border-light)', borderRadius: '12px', padding: '16px 18px', marginBottom: '12px', background: 'var(--bg-white)' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <span style={{ flexShrink: 0, fontSize: '13px', fontWeight: 800, color: '#fff', background: color, borderRadius: '6px', padding: '2px 9px' }}>{si + 1}</span>
+                    <h3 style={{ margin: 0, fontSize: '16.5px', flex: 1, minWidth: 0 }}>{sec.heading}</h3>
+                    <span style={{ flexShrink: 0, fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>⏱ {sec.minutes}분</span>
+                  </div>
+                  <ul style={{ margin: '0 0 10px', paddingLeft: '18px', lineHeight: 1.85 }}>
+                    {sec.points.map((p, pi) => <li key={pi}>{p}</li>)}
+                  </ul>
+                  <p style={{ margin: '0 0 8px', fontSize: '14px', lineHeight: 1.75, color: 'var(--text-primary)' }}>{sec.detail}</p>
+                  {sec.example && (
+                    <div style={{ fontSize: '13px', lineHeight: 1.7, color: 'var(--text-secondary)', background: 'var(--bg-light-gray)', borderRadius: '8px', padding: '8px 12px' }}>
+                      <strong style={{ color }}>예시</strong> · {sec.example}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              <div className="pgd-card" style={{ borderLeft: `4px solid ${color}` }}>
+                <strong style={{ color }}>마무리</strong> · {content.wrapup}
+              </div>
+            </section>
+          )}
 
           {plan && (
             <Section icon="🛠️" title="활동·실습">
