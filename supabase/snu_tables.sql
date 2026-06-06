@@ -127,58 +127,87 @@ CREATE TABLE IF NOT EXISTS snu_resources (
 
 -- 공지사항: 누구나 읽기, 관리자만 쓰기
 ALTER TABLE snu_announcements ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_announcements_select" ON snu_announcements;
 CREATE POLICY "snu_announcements_select" ON snu_announcements FOR SELECT USING (true);
+DROP POLICY IF EXISTS "snu_announcements_insert" ON snu_announcements;
 CREATE POLICY "snu_announcements_insert" ON snu_announcements FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_announcements_update" ON snu_announcements;
 CREATE POLICY "snu_announcements_update" ON snu_announcements FOR UPDATE USING (auth.uid() = author_id);
+DROP POLICY IF EXISTS "snu_announcements_delete" ON snu_announcements;
 CREATE POLICY "snu_announcements_delete" ON snu_announcements FOR DELETE USING (auth.uid() = author_id);
 
 -- 학습자료: 로그인 사용자 읽기, 관리자만 쓰기
 ALTER TABLE snu_materials ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_materials_select" ON snu_materials;
 CREATE POLICY "snu_materials_select" ON snu_materials FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_materials_insert" ON snu_materials;
 CREATE POLICY "snu_materials_insert" ON snu_materials FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_materials_update" ON snu_materials;
 CREATE POLICY "snu_materials_update" ON snu_materials FOR UPDATE USING (auth.uid() = author_id);
+DROP POLICY IF EXISTS "snu_materials_delete" ON snu_materials;
 CREATE POLICY "snu_materials_delete" ON snu_materials FOR DELETE USING (auth.uid() = author_id);
 
 -- 과제: 로그인 사용자 읽기, 관리자만 쓰기
 ALTER TABLE snu_assignments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_assignments_select" ON snu_assignments;
 CREATE POLICY "snu_assignments_select" ON snu_assignments FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_assignments_insert" ON snu_assignments;
 CREATE POLICY "snu_assignments_insert" ON snu_assignments FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_assignments_update" ON snu_assignments;
 CREATE POLICY "snu_assignments_update" ON snu_assignments FOR UPDATE USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_assignments_delete" ON snu_assignments;
 CREATE POLICY "snu_assignments_delete" ON snu_assignments FOR DELETE USING (auth.uid() IS NOT NULL);
 
 -- 제출: 본인 것만 읽기/쓰기, 관리자는 전체
 ALTER TABLE snu_submissions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_submissions_select" ON snu_submissions;
 CREATE POLICY "snu_submissions_select" ON snu_submissions FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_submissions_insert" ON snu_submissions;
 CREATE POLICY "snu_submissions_insert" ON snu_submissions FOR INSERT WITH CHECK (auth.uid() = student_id);
+DROP POLICY IF EXISTS "snu_submissions_update" ON snu_submissions;
 CREATE POLICY "snu_submissions_update" ON snu_submissions FOR UPDATE USING (auth.uid() = student_id OR auth.uid() IS NOT NULL);
 
 -- 출석
 ALTER TABLE snu_attendance ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_attendance_select" ON snu_attendance;
 CREATE POLICY "snu_attendance_select" ON snu_attendance FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_attendance_insert" ON snu_attendance;
 CREATE POLICY "snu_attendance_insert" ON snu_attendance FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_attendance_update" ON snu_attendance;
 CREATE POLICY "snu_attendance_update" ON snu_attendance FOR UPDATE USING (auth.uid() IS NOT NULL);
 
 -- 팀
 ALTER TABLE snu_teams ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_teams_select" ON snu_teams;
 CREATE POLICY "snu_teams_select" ON snu_teams FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_teams_insert" ON snu_teams;
 CREATE POLICY "snu_teams_insert" ON snu_teams FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_teams_update" ON snu_teams;
 CREATE POLICY "snu_teams_update" ON snu_teams FOR UPDATE USING (auth.uid() IS NOT NULL);
 
 -- 프로젝트
 ALTER TABLE snu_projects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_projects_select" ON snu_projects;
 CREATE POLICY "snu_projects_select" ON snu_projects FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_projects_insert" ON snu_projects;
 CREATE POLICY "snu_projects_insert" ON snu_projects FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_projects_update" ON snu_projects;
 CREATE POLICY "snu_projects_update" ON snu_projects FOR UPDATE USING (auth.uid() IS NOT NULL);
 
 -- Q&A
 ALTER TABLE snu_qna ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_qna_select" ON snu_qna;
 CREATE POLICY "snu_qna_select" ON snu_qna FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_qna_insert" ON snu_qna;
 CREATE POLICY "snu_qna_insert" ON snu_qna FOR INSERT WITH CHECK (auth.uid() = author_id);
+DROP POLICY IF EXISTS "snu_qna_update" ON snu_qna;
 CREATE POLICY "snu_qna_update" ON snu_qna FOR UPDATE USING (auth.uid() IS NOT NULL);
 
 -- 리소스: 누구나 읽기
 ALTER TABLE snu_resources ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_resources_select" ON snu_resources;
 CREATE POLICY "snu_resources_select" ON snu_resources FOR SELECT USING (true);
+DROP POLICY IF EXISTS "snu_resources_insert" ON snu_resources;
 CREATE POLICY "snu_resources_insert" ON snu_resources FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
 -- ============================================
@@ -213,13 +242,16 @@ CREATE TABLE IF NOT EXISTS snu_assessments (
 
 ALTER TABLE snu_assessments ENABLE ROW LEVEL SECURITY;
 -- 본인 성적은 본인이, 전체 성적은 관리자(ADMIN_EMAILS)만 조회
+DROP POLICY IF EXISTS "snu_assessments_select" ON snu_assessments;
 CREATE POLICY "snu_assessments_select" ON snu_assessments FOR SELECT
     USING (
         auth.uid() = student_id
         OR (auth.jwt() ->> 'email') IN ('aebon@kakao.com', 'radical8566@gmail.com', 'aebon@kyonggi.ac.kr')
     );
+DROP POLICY IF EXISTS "snu_assessments_insert" ON snu_assessments;
 CREATE POLICY "snu_assessments_insert" ON snu_assessments FOR INSERT
     WITH CHECK (auth.uid() = student_id);
+DROP POLICY IF EXISTS "snu_assessments_update" ON snu_assessments;
 CREATE POLICY "snu_assessments_update" ON snu_assessments FOR UPDATE
     USING (auth.uid() = student_id)
     WITH CHECK (auth.uid() = student_id);
@@ -244,6 +276,7 @@ CREATE TABLE IF NOT EXISTS snu_team_posts (
 ALTER TABLE snu_team_posts ENABLE ROW LEVEL SECURITY;
 
 -- 조회: 글이 속한 팀의 members에 내 uid가 들어있거나, 관리자
+DROP POLICY IF EXISTS "snu_team_posts_select" ON snu_team_posts;
 CREATE POLICY "snu_team_posts_select" ON snu_team_posts FOR SELECT
     USING (
         EXISTS (
@@ -255,6 +288,7 @@ CREATE POLICY "snu_team_posts_select" ON snu_team_posts FOR SELECT
     );
 
 -- 작성: 본인 글 + 자기가 속한 팀에만
+DROP POLICY IF EXISTS "snu_team_posts_insert" ON snu_team_posts;
 CREATE POLICY "snu_team_posts_insert" ON snu_team_posts FOR INSERT
     WITH CHECK (
         auth.uid() = author_id
@@ -266,6 +300,7 @@ CREATE POLICY "snu_team_posts_insert" ON snu_team_posts FOR INSERT
     );
 
 -- 삭제: 작성자 본인 또는 관리자
+DROP POLICY IF EXISTS "snu_team_posts_delete" ON snu_team_posts;
 CREATE POLICY "snu_team_posts_delete" ON snu_team_posts FOR DELETE
     USING (
         auth.uid() = author_id
@@ -290,10 +325,13 @@ CREATE TABLE IF NOT EXISTS snu_project_topics (
 );
 
 ALTER TABLE snu_project_topics ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_project_topics_select" ON snu_project_topics;
 CREATE POLICY "snu_project_topics_select" ON snu_project_topics FOR SELECT
     USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_project_topics_insert" ON snu_project_topics;
 CREATE POLICY "snu_project_topics_insert" ON snu_project_topics FOR INSERT
     WITH CHECK (auth.uid() = created_by);
+DROP POLICY IF EXISTS "snu_project_topics_delete" ON snu_project_topics;
 CREATE POLICY "snu_project_topics_delete" ON snu_project_topics FOR DELETE
     USING (
         auth.uid() = created_by
@@ -310,12 +348,16 @@ CREATE TABLE IF NOT EXISTS snu_topic_votes (
 );
 
 ALTER TABLE snu_topic_votes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_topic_votes_select" ON snu_topic_votes;
 CREATE POLICY "snu_topic_votes_select" ON snu_topic_votes FOR SELECT
     USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "snu_topic_votes_insert" ON snu_topic_votes;
 CREATE POLICY "snu_topic_votes_insert" ON snu_topic_votes FOR INSERT
     WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "snu_topic_votes_update" ON snu_topic_votes;
 CREATE POLICY "snu_topic_votes_update" ON snu_topic_votes FOR UPDATE
     USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "snu_topic_votes_delete" ON snu_topic_votes;
 CREATE POLICY "snu_topic_votes_delete" ON snu_topic_votes FOR DELETE
     USING (auth.uid() = user_id);
 
@@ -333,13 +375,16 @@ CREATE TABLE IF NOT EXISTS snu_pledges (
 );
 
 ALTER TABLE snu_pledges ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_pledges_select" ON snu_pledges;
 CREATE POLICY "snu_pledges_select" ON snu_pledges FOR SELECT
     USING (
         auth.uid() = user_id
         OR (auth.jwt() ->> 'email') IN ('aebon@kakao.com', 'radical8566@gmail.com', 'aebon@kyonggi.ac.kr')
     );
+DROP POLICY IF EXISTS "snu_pledges_insert" ON snu_pledges;
 CREATE POLICY "snu_pledges_insert" ON snu_pledges FOR INSERT
     WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "snu_pledges_update" ON snu_pledges;
 CREATE POLICY "snu_pledges_update" ON snu_pledges FOR UPDATE
     USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
@@ -361,7 +406,9 @@ CREATE TABLE IF NOT EXISTS snu_schedule (
 );
 
 ALTER TABLE snu_schedule ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "snu_schedule_select" ON snu_schedule;
 CREATE POLICY "snu_schedule_select" ON snu_schedule FOR SELECT USING (true);
+DROP POLICY IF EXISTS "snu_schedule_write" ON snu_schedule;
 CREATE POLICY "snu_schedule_write"  ON snu_schedule FOR ALL USING (auth.uid() IS NOT NULL) WITH CHECK (auth.uid() IS NOT NULL);
 
 INSERT INTO snu_schedule (no, date, weekday, time, title, topics, instructor, mode, mode_label) VALUES

@@ -10,7 +10,12 @@
 
 ## 적용 방법
 
-Supabase SQL Editor 또는 Management API로 `snu_tables.sql` 을 실행합니다.
+`snu_tables.sql` 은 **멱등(idempotent)** 합니다 — 모든 정책에 `DROP POLICY IF EXISTS` 가
+선행하고, 테이블/인덱스는 `IF NOT EXISTS`, 일정 시드는 `ON CONFLICT DO UPDATE` 라서
+**이미 적용된 DB에 다시 실행해도 오류 없이 통과**합니다. Supabase Dashboard → SQL Editor 에
+전체를 붙여넣고 실행하면 됩니다.
+
+Management API 로 실행할 수도 있습니다:
 
 ```bash
 TOKEN=<SUPABASE_ACCESS_TOKEN>   # .env.local 참조
