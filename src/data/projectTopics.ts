@@ -121,3 +121,33 @@ export const PRESET_TOPICS: PresetTopic[] = [
 
 export const PRESET_KEYS = new Set(PRESET_TOPICS.map((t) => t.key));
 export const REGIONS: Region[] = ['서울', '제주'];
+
+/** 지역별 착수 데이터 가이드 (3주차 데이터 탐색 워크숍에서 우선 확보) */
+export const REGION_DATA_GUIDE: Record<Region, { name: string; url: string }[]> = {
+  서울: [
+    { name: '서울 열린데이터광장', url: 'https://data.seoul.go.kr' },
+    { name: 'S-DoT 도시데이터(서울 열린데이터광장)', url: 'https://data.seoul.go.kr' },
+    { name: '공공데이터포털', url: 'https://www.data.go.kr' },
+  ],
+  제주: [
+    { name: '제주데이터허브', url: 'https://www.jejudatahub.net' },
+    { name: '공공데이터포털', url: 'https://www.data.go.kr' },
+    { name: '환경부·해양수산부 공공데이터', url: 'https://www.data.go.kr' },
+  ],
+};
+
+/** 모든 팀 공통 산출물 (3분 피치덱·프로토타입으로 마무리) */
+export const STANDARD_DELIVERABLES: string[] = [
+  '문제정의서 — “왜 중요한 문제인가” 정리',
+  '데이터 분석·시각화 (지도/대시보드 등)',
+  '프로토타입 — 웹앱/대시보드/챗봇 등 기술 산출물',
+  '3분 피치덱 + 발표 스크립트 (해커톤 제출형)',
+];
+
+/** key 로 주제 찾기 */
+export const getTopic = (key: string): PresetTopic | undefined =>
+  PRESET_TOPICS.find((t) => t.key === key);
+
+/** 지역별 주제 목록 */
+export const topicsByRegion = (region: Region): PresetTopic[] =>
+  PRESET_TOPICS.filter((t) => t.region === region);

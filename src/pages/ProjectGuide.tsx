@@ -1,219 +1,168 @@
-import { useState, useEffect, type ReactElement } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, type ReactElement } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
-import { PROJECT_DATA, type ProjectData } from '../data/projectDetails';
-import FlowDiagram from '../components/FlowDiagram';
+import {
+  PRESET_TOPICS,
+  REGIONS,
+  REGION_DATA_GUIDE,
+  STANDARD_DELIVERABLES,
+  getTopic,
+  topicsByRegion,
+  type Region,
+} from '../data/projectTopics';
+import { MAX_TEAM_SIZE, TRACK_CAP } from '../utils/projectTeams';
 
-const Section = ({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) => (
-  <section className="pgd-section">
-    <h2><span className="pgd-section-icon">{icon}</span> {title}</h2>
-    <div className="pgd-card">{children}</div>
-  </section>
-);
-
-const ProjectDetail = ({ project }: { project: ProjectData }): ReactElement => (
-  <>
-    {/* 프로젝트 개요 */}
-    <Section icon="ℹ️" title="프로젝트 개요">
-      <p className="pgd-overview">{project.overview}</p>
-      <div className="pgd-meta-grid">
-        <div>
-          <h4>주요 대상</h4>
-          <ul>{project.targetUsers.map((u, i) => <li key={i}>{u}</li>)}</ul>
-        </div>
-        <div>
-          <h4>학습 목표</h4>
-          <ul>{project.objectives.map((o, i) => <li key={i}>{o}</li>)}</ul>
-        </div>
-      </div>
-    </Section>
-
-    {/* 시스템 아키텍처 */}
-    <Section icon="🏗️" title="시스템 아키텍처">
-      <p>{project.architecture.description}</p>
-      <div className="pgd-diagram">
-        <FlowDiagram projectId={project.id} color={project.color} />
-      </div>
-      <div className="pgd-components">
-        {project.architecture.components.map((comp, i) => (
-          <div key={i} className="pgd-component">
-            <h4>{comp.name}</h4>
-            <p>{comp.description}</p>
-            <span className="pgd-tech-badge">{comp.tech}</span>
-          </div>
-        ))}
-      </div>
-    </Section>
-
-    {/* 데이터 파이프라인 */}
-    <Section icon="🔄" title="데이터 파이프라인">
-      <div className="pgd-pipeline">
-        {project.pipeline.steps.map(step => (
-          <div key={step.step} className="pgd-pipeline-step">
-            <div className="pgd-step-num" style={{ background: project.color }}>{step.step}</div>
-            <div className="pgd-step-body">
-              <h4>{step.title}</h4>
-              <p>{step.description}</p>
-              <span className="pgd-tech-badge">{step.tools}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </Section>
-
-    {/* Solar API 활용 */}
-    <Section icon="☀️" title="Solar API 활용">
-      <p>{project.solarApi.description}</p>
-      {project.solarApi.endpoints.map((ep, i) => (
-        <div key={i} className="pgd-api-endpoint">
-          <h4>{ep.name}</h4>
-          <p>{ep.purpose}</p>
-          <div className="pgd-code-block"><code>{ep.example}</code></div>
-        </div>
-      ))}
-    </Section>
-
-    {/* 프롬프트 엔지니어링 */}
-    <Section icon="✨" title="프롬프트 엔지니어링">
-      <p>{project.prompts.description}</p>
-      {project.prompts.examples.map((ex, i) => (
-        <div key={i} className="pgd-prompt">
-          <h4>{ex.title}</h4>
-          <div className="pgd-prompt-block"><pre>{ex.prompt}</pre></div>
-          <p className="pgd-prompt-note">💡 {ex.note}</p>
-        </div>
-      ))}
-    </Section>
-
-    {/* 구현 가이드 */}
-    <Section icon="💻" title="구현 가이드">
-      <div className="pgd-impl-grid">
-        <div className="pgd-impl-item">
-          <h3>🖥️ 프론트엔드</h3>
-          <p>{project.implementation.frontend.description}</p>
-          <span className="pgd-tech-badge">{project.implementation.frontend.stack}</span>
-          <h4>주요 페이지</h4>
-          <ul>{project.implementation.frontend.pages.map((pg, i) => <li key={i}>{pg}</li>)}</ul>
-        </div>
-        <div className="pgd-impl-item">
-          <h3>⚙️ 백엔드</h3>
-          <p>{project.implementation.backend.description}</p>
-          <span className="pgd-tech-badge">{project.implementation.backend.stack}</span>
-          <h4>API 엔드포인트</h4>
-          <ul>{project.implementation.backend.apis.map((a, i) => <li key={i}>{a}</li>)}</ul>
-        </div>
-      </div>
-      <div className="pgd-db">
-        <h3>🗄️ 데이터베이스</h3>
-        <div className="pgd-db-tables">
-          {project.implementation.database.tables.map((t, i) => (
-            <div key={i} className="pgd-db-table">
-              <h4>{t.name}</h4>
-              <code>{t.fields}</code>
-            </div>
-          ))}
-        </div>
-      </div>
-    </Section>
-
-    {/* 배포 계획 */}
-    <Section icon="🚀" title="배포 계획">
-      <span className="pgd-tech-badge">{project.deployment.infra}</span>
-      <ol className="pgd-deploy-steps">
-        {project.deployment.steps.map((s, i) => <li key={i}>{s}</li>)}
-      </ol>
-    </Section>
-
-    {/* 확장 가능성 */}
-    <Section icon="🌟" title="확장 가능성">
-      <ul className="pgd-expansion">
-        {project.expansion.map((e, i) => (
-          <li key={i}><span style={{ color: project.color }}>✓</span> {e}</li>
-        ))}
-      </ul>
-    </Section>
-  </>
-);
+const regionColor: Record<Region, string> = { 서울: '#0046C8', 제주: '#00855A' };
 
 const ProjectGuide = (): ReactElement => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [selectedId, setSelectedId] = useState(id ? Number(id) : 1);
+  const selectedKey = id && getTopic(id) ? id : PRESET_TOPICS[0]?.key;
+  const topic = selectedKey ? getTopic(selectedKey) : undefined;
 
   useEffect(() => {
-    if (id) setSelectedId(Number(id));
-  }, [id]);
+    if (id && !getTopic(id) && PRESET_TOPICS[0]) {
+      navigate(`/project-guide/${PRESET_TOPICS[0].key}`, { replace: true });
+    }
+  }, [id, navigate]);
 
-  const project = PROJECT_DATA.find(p => p.id === selectedId) || PROJECT_DATA[0];
-
-  const handleSelect = (projectId: number) => {
-    setSelectedId(projectId);
-    navigate(`/project-guide/${projectId}`, { replace: true });
+  const handleSelect = (key: string) => {
+    navigate(`/project-guide/${key}`, { replace: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!project) {
+  if (!topic) {
     return (
       <>
         <SEOHead title="프로젝트 안내" path="/project-guide" />
         <section className="page-header">
-          <div className="container">
-            <h2>프로젝트 안내</h2>
-            <p>지역문제 해결형 PBL 프로젝트 가이드는 준비 중입니다.</p>
-          </div>
-        </section>
-        <section className="section">
-          <div className="container">
-            <p style={{ color: 'var(--text-secondary, #6b7280)' }}>
-              기술·인문 트랙 팀 프로젝트 가이드가 곧 제공됩니다. 강의 일정은 <a href="/schedule">강의 일정</a>에서 확인하세요.
-            </p>
-          </div>
+          <div className="container"><h2>프로젝트 안내</h2><p>준비 중입니다.</p></div>
         </section>
       </>
     );
   }
 
+  const color = regionColor[topic.region];
+  const idx = topicsByRegion(topic.region).findIndex((t) => t.key === topic.key) + 1;
+
   return (
     <>
-      <SEOHead title={project.title} path={`/project-guide/${selectedId}`} />
+      <SEOHead title={`${topic.region} · ${topic.title}`} path={`/project-guide/${topic.key}`} />
 
       <section className="page-header">
         <div className="container">
           <h2>프로젝트 안내</h2>
-          <p>지역문제 해결형 PBL 프로젝트의 참고 가이드입니다. 생성형 AI를 활용한 실전 프로젝트 사례를 살펴보고 팀 산출물 설계에 참고하세요.</p>
+          <p>서울·제주 지역문제 해결형 PBL 프로젝트 14선 — 기술·인문 듀얼 트랙, 생성형 AI 기반</p>
         </div>
       </section>
 
       <div className="sidebar-layout">
         <aside className="sidebar">
           <nav className="sidebar-menu">
-            {PROJECT_DATA.map(p => (
-              <button
-                key={p.id}
-                className={`sidebar-item ${p.id === selectedId ? 'active' : ''}`}
-                onClick={() => handleSelect(p.id)}
-              >
-                <span className="sidebar-item-text">{p.title}</span>
-              </button>
+            {REGIONS.map((region) => (
+              <div key={region}>
+                <div style={{
+                  padding: '10px 14px 6px', fontSize: '12px', fontWeight: 800,
+                  letterSpacing: '0.04em', color: regionColor[region],
+                }}>
+                  {region} 지역문제 ({topicsByRegion(region).length})
+                </div>
+                {topicsByRegion(region).map((t) => (
+                  <button
+                    key={t.key}
+                    className={`sidebar-item ${t.key === topic.key ? 'active' : ''}`}
+                    onClick={() => handleSelect(t.key)}
+                  >
+                    <span className="sidebar-item-text">{t.title}</span>
+                  </button>
+                ))}
+              </div>
             ))}
           </nav>
         </aside>
 
         <div className="sidebar-content">
-          <div className="pgd-hero-card" style={{ borderLeftColor: project.color }}>
-            <span className="pgd-hero-icon" style={{ background: `${project.color}18`, color: project.color }}>{project.icon}</span>
+          {/* 히어로 */}
+          <div className="pgd-hero-card" style={{ borderLeftColor: color }}>
+            <span className="pgd-hero-icon" style={{ background: `${color}18`, color }}>
+              {topic.region === '서울' ? '🏙️' : '🌊'}
+            </span>
             <div>
-              <h3 className="pgd-hero-title">{project.title}</h3>
-              <p className="pgd-hero-subtitle">{project.subtitle}</p>
-              <div className="pg-card-tags" style={{ marginTop: '8px' }}>
-                {project.solarApi.endpoints.map((ep, i) => (
-                  <span key={i} className="pg-tag">{ep.name.split(' (')[0]}</span>
-                ))}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                <span style={{ fontSize: '12.5px', fontWeight: 800, padding: '2px 10px', borderRadius: '999px', background: `${color}18`, color }}>
+                  {topic.region} {idx}
+                </span>
               </div>
+              <h3 className="pgd-hero-title">{topic.title}</h3>
+              <p className="pgd-hero-subtitle">{topic.description}</p>
             </div>
           </div>
 
-          <ProjectDetail project={project} />
+          {/* 듀얼 트랙 */}
+          <section className="pgd-section">
+            <h2><span className="pgd-section-icon">🧭</span> 듀얼 트랙 역할 분담</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+              <div className="pgd-card" style={{ borderTop: '4px solid #0046C8' }}>
+                <h4 style={{ margin: '0 0 8px', color: '#0046C8' }}>🛠️ 기술 트랙</h4>
+                <p style={{ margin: 0, lineHeight: 1.7 }}>{topic.techTrack}</p>
+              </div>
+              <div className="pgd-card" style={{ borderTop: '4px solid #00855A' }}>
+                <h4 style={{ margin: '0 0 8px', color: '#00855A' }}>📖 인문 트랙</h4>
+                <p style={{ margin: 0, lineHeight: 1.7 }}>{topic.humanTrack}</p>
+              </div>
+            </div>
+          </section>
+
+          {/* 팀 구성 */}
+          <section className="pgd-section">
+            <h2><span className="pgd-section-icon">👥</span> 팀 구성</h2>
+            <div className="pgd-card">
+              <p style={{ margin: 0, lineHeight: 1.7 }}>
+                한 팀 <strong>{MAX_TEAM_SIZE}명</strong> — 기술 트랙 {TRACK_CAP}명 + 인문 트랙 {TRACK_CAP}명.
+                관심 도메인에 따라 트랙을 선택해 한 팀 안에서 자연스럽게 역할이 나뉩니다.
+              </p>
+            </div>
+          </section>
+
+          {/* 착수 데이터 */}
+          <section className="pgd-section">
+            <h2><span className="pgd-section-icon">📊</span> 착수 데이터 가이드</h2>
+            <div className="pgd-card">
+              <p style={{ margin: '0 0 10px', lineHeight: 1.7 }}>
+                3주차 데이터 탐색 워크숍에서 아래 공공데이터로 착수 데이터를 먼저 확보하세요.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {REGION_DATA_GUIDE[topic.region].map((d) => (
+                  <a key={d.name} href={d.url} target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize: '13.5px', fontWeight: 600, padding: '6px 12px', borderRadius: '999px', background: `${color}14`, color, textDecoration: 'none' }}>
+                    {d.name} ↗
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* 산출물 */}
+          <section className="pgd-section">
+            <h2><span className="pgd-section-icon">🎯</span> 최종 산출물</h2>
+            <div className="pgd-card">
+              <ul style={{ margin: 0, paddingLeft: '18px', lineHeight: 1.9 }}>
+                {STANDARD_DELIVERABLES.map((d, i) => (
+                  <li key={i}><span style={{ color }}>✓</span> {d}</li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          {/* CTA */}
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '8px' }}>
+            <Link to="/project-vote" className="btn btn-primary" style={{ padding: '11px 22px' }}>
+              이 주제로 팀 만들기 →
+            </Link>
+            <Link to="/schedule" className="btn btn-secondary" style={{ padding: '11px 22px' }}>
+              강의 일정 보기
+            </Link>
+          </div>
         </div>
       </div>
     </>

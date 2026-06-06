@@ -6,7 +6,13 @@ import {
   ONLINE_SESSION_NOS,
   OFFLINE_FIXED_NOS,
 } from '../config/snuSchedule';
+import { topicsByRegion, REGIONS, type Region } from '../data/projectTopics';
 import type { ReactElement } from 'react';
+
+const regionMeta: Record<Region, { icon: string; color: string; sub: string }> = {
+  서울: { icon: '🏙️', color: '#0046C8', sub: '도시 생활·안전·복지 문제' },
+  제주: { icon: '🌊', color: '#00855A', sub: '생태·관광·자원 문제 (해커톤 연계)' },
+};
 
 const offlineCount = SNU_SESSIONS.length - ONLINE_SESSION_NOS.length;
 
@@ -155,6 +161,38 @@ const Home = (): ReactElement => {
                   <h4>{p.title}</h4>
                   <p>{p.desc}</p>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 프로젝트 주제 미리보기 (서울/제주) */}
+      <section className="section section-alt">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">프로젝트 주제 — 서울 7 · 제주 7</h2>
+            <p className="section-subtitle">지역문제 해결형 14개 주제 중 하나를 골라 팀을 구성합니다. 모든 주제는 기술·인문 듀얼 트랙으로 진행됩니다.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            {REGIONS.map((region) => (
+              <div key={region} style={{ background: 'var(--bg-white, #fff)', border: '1px solid var(--border-light, #e5e7eb)', borderTop: `4px solid ${regionMeta[region].color}`, borderRadius: '14px', padding: '22px 24px' }}>
+                <h3 style={{ margin: '0 0 4px', fontSize: '18px' }}>
+                  {regionMeta[region].icon} {region} 지역문제 해결
+                </h3>
+                <p style={{ margin: '0 0 12px', fontSize: '13px', color: 'var(--text-secondary, #6b7280)' }}>{regionMeta[region].sub}</p>
+                <ul style={{ margin: 0, paddingLeft: '18px', lineHeight: 1.9, fontSize: '14.5px' }}>
+                  {topicsByRegion(region).map((t) => (
+                    <li key={t.key}>
+                      <Link to={`/project-guide/${t.key}`} style={{ color: 'var(--text-primary, #1a1a1a)', textDecoration: 'none' }}>
+                        {t.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/project-guide" className="btn btn-secondary" style={{ marginTop: '16px', padding: '9px 18px', fontSize: '14px' }}>
+                  {region} 주제 전체 보기 →
+                </Link>
               </div>
             ))}
           </div>
