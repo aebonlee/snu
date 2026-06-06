@@ -205,11 +205,13 @@ const PblInfo = (): ReactElement => {
                       return (
                         <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ flex: '0 0 230px', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.icon} {i + 1}. {s.label}</span>
-                          <div style={{ flex: '0 0 150px', height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
+                          <div style={{ flex: '0 0 180px', height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
                             <div style={{ width: `${(pts / s.max) * 100}%`, height: '100%', background: s.color, transition: 'width .3s' }} />
                           </div>
-                          <span style={{ flex: '0 0 auto', textAlign: 'left', fontSize: '12.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                            {typeof a === 'number' ? <span style={{ color: s.color }}>{pts}/{s.max}</span> : <span style={{ color: 'var(--text-secondary)' }}>미작성</span>}
+                          <span style={{ flex: '0 0 auto', fontSize: '12.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                            {typeof a === 'number'
+                              ? <span style={{ display: 'inline-block', minWidth: '52px', textAlign: 'right', color: s.color }}>{pts}/{s.max}</span>
+                              : <span style={{ display: 'inline-block', minWidth: '52px', textAlign: 'right', color: 'var(--text-secondary)' }}>미작성</span>}
                             {typeof t === 'number' && <span style={{ color: '#92400e' }}> · 강사 {t}</span>}
                           </span>
                         </div>
