@@ -104,6 +104,8 @@ export interface UserProfile {
   display_name: string;
   avatar_url: string;
   phone: string;
+  student_no?: string;
+  major?: string;
   provider: string;
   role: string;
   signup_domain: string;

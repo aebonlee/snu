@@ -57,22 +57,11 @@ const site: SiteConfig = {
         { path: '/about', labelKey: 'nav.about' },
         { path: '/classroom', labelKey: 'site.nav.classroom' },
         { path: '/curriculum', labelKey: 'site.nav.curriculum' },
-        { path: '/schedule', labelKey: 'site.nav.schedule' },
         { path: '/instructor', labelKey: 'site.nav.instructor' },
       ]
     },
     { path: '/schedule', labelKey: 'site.nav.schedule' },
-    {
-      labelKey: 'site.nav.project',
-      path: '/project-guide',
-      activePath: '/project',
-      dropdown: [
-        { path: '/project-guide', labelKey: 'site.nav.projectIntro' },
-        { path: '/project-vote', labelKey: 'site.nav.projectVote' },
-        { path: '/project-board', labelKey: 'site.nav.projectBoard' },
-        { path: '/projects/apps', labelKey: 'site.nav.projectApps' },
-      ]
-    },
+    { path: '/lessons', labelKey: 'site.nav.lessons' },
     {
       labelKey: 'site.nav.pbl',
       path: '/pbl/info',
@@ -87,6 +76,17 @@ const site: SiteConfig = {
         { path: '/pbl/final', labelKey: 'site.nav.pblFinal' },
         { path: '/pbl/rubric', labelKey: 'site.nav.pblRubric' },
         { path: '/pbl/eval', labelKey: 'site.nav.pblEval' },
+      ]
+    },
+    {
+      labelKey: 'site.nav.project',
+      path: '/project-guide',
+      activePath: '/project',
+      dropdown: [
+        { path: '/project-guide', labelKey: 'site.nav.projectIntro' },
+        { path: '/project-vote', labelKey: 'site.nav.projectVote' },
+        { path: '/project-board', labelKey: 'site.nav.projectBoard' },
+        { path: '/projects/apps', labelKey: 'site.nav.projectApps' },
       ]
     },
     { path: '/resources', labelKey: 'site.nav.resources' },

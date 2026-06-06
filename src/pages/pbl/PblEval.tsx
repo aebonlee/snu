@@ -76,7 +76,7 @@ const PblEval = (): ReactElement => {
                 <button key={r.user_id} className={`sidebar-item ${r.user_id === selId ? 'active' : ''}`} onClick={() => setSelId(r.user_id)}>
                   <span className="sidebar-item-text">
                     {r.student_name || '(이름없음)'} · {totalScore(r.scores)}/{PBL_TOTAL}
-                    <br /><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{r.team_name || '-'}</span>
+                    <br /><span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{r.student_no || '-'} · {r.major || '-'}</span>
                   </span>
                 </button>
               ))}
@@ -91,7 +91,7 @@ const PblEval = (): ReactElement => {
                   <div>
                     <h3 className="pgd-hero-title">{sel.student_name || '(이름없음)'}</h3>
                     <p className="pgd-hero-subtitle">
-                      팀 {sel.team_name || '-'} · {sel.region || '-'} · {sel.track || '-'} 트랙
+                      {sel.student_no || '-'} · {sel.major || '-'} · {sel.phone || '-'} · {sel.track || '-'} 트랙
                       {sel.topic_key && getTopic(sel.topic_key) && <> · {getTopic(sel.topic_key)!.title}</>}
                       {' · '}🤖 자동 <strong>{autoTotal(sel.auto)}</strong> · 👩‍🏫 강사 <strong>{totalScore(sel.scores)}</strong> / {PBL_TOTAL}점
                     </p>

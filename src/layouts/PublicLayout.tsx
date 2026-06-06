@@ -10,6 +10,7 @@ import site from '../config/site';
 const Home = lazy(() => import('../pages/Home'));
 const Curriculum = lazy(() => import('../pages/Curriculum'));
 const Schedule = lazy(() => import('../pages/Schedule'));
+const Lessons = lazy(() => import('../pages/Lessons'));
 const Competition = lazy(() => import('../pages/Competition'));
 const Resources = lazy(() => import('../pages/Resources'));
 const Instructor = lazy(() => import('../pages/Instructor'));
@@ -74,6 +75,8 @@ const PublicLayout = (): ReactElement => {
             <Route path="/" element={<Home />} />
             <Route path="/curriculum" element={<Curriculum />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="/lessons" element={<Navigate to="/lessons/day01" replace />} />
+            <Route path="/lessons/:day" element={<Lessons />} />
             <Route path="/competition" element={<Competition />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/instructor" element={<Instructor />} />

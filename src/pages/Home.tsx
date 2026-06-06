@@ -77,8 +77,8 @@ const Home = (): ReactElement => {
               <span className="title-line"><span className="highlight">PBL · 지역문제 해결 프로젝트</span></span>
             </h1>
             <p className="hero-description">
-              빅데이터 혁신공유대학(COSS) 데이터 창업 MD 교과목. ESG 관점의 사회·환경 문제를
-              데이터로 정의·분석하고 생성형 AI로 해결하는, 전공 무관 융합형 캡스톤 디자인.
+              빅데이터 혁신공유대학(COSS) 데이터 창업 MD 교과목.<br />
+              ESG 관점의 사회·환경 문제를 데이터로 정의·분석하고 생성형 AI로 해결하는, 전공 무관 융합형 캡스톤 디자인.<br />
               기술·인문 2개 트랙으로 운영하며 제주국제 생태포럼 해커톤과 연계합니다.
             </p>
             <div className="hero-info-cards">

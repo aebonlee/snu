@@ -12,7 +12,9 @@ export const PBL_TABLE = `${site.dbPrefix}pbl_submissions`;
 
 export interface PblInfo {
   student_name: string;
-  team_name: string;
+  student_no: string;
+  major: string;
+  phone: string;
   region: string;
   topic_key: string;
   track: string;
@@ -22,6 +24,9 @@ export interface PblSubmission {
   user_id: string;
   email: string;
   student_name: string;
+  student_no: string;
+  major: string;
+  phone: string;
   team_name: string;
   region: string;
   topic_key: string;
@@ -50,7 +55,9 @@ export async function saveInfo(user: AuthUser, info: PblInfo): Promise<void> {
     user_id: user.id,
     email: user.email || '',
     student_name: info.student_name || '',
-    team_name: info.team_name || '',
+    student_no: info.student_no || '',
+    major: info.major || '',
+    phone: info.phone || '',
     region: info.region || '',
     topic_key: info.topic_key || '',
     track: info.track || '',
