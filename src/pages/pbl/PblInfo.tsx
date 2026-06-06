@@ -196,8 +196,8 @@ const PblInfo = (): ReactElement => {
                 </div>
 
                 <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'stretch' }}>
-                  {/* 좌측 2/3 — 항목별 막대 */}
-                  <div style={{ flex: '2 1 360px', minWidth: 0, paddingRight: '44px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {/* 좌측 2/3 — 항목별 막대 (막대–점수 좁게, 점수–박스 넓게) */}
+                  <div style={{ flex: '2 1 360px', minWidth: 0, paddingRight: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {PBL_STAGES.map((s, i) => {
                       const a = sub?.auto?.[s.key];
                       const t = sub?.scores?.[s.key];
@@ -205,7 +205,7 @@ const PblInfo = (): ReactElement => {
                       return (
                         <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ flex: '0 0 230px', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.icon} {i + 1}. {s.label}</span>
-                          <div style={{ flex: '1 1 60px', height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
+                          <div style={{ flex: '0 0 150px', height: '10px', borderRadius: '5px', background: 'var(--bg-light-gray)', overflow: 'hidden' }}>
                             <div style={{ width: `${(pts / s.max) * 100}%`, height: '100%', background: s.color, transition: 'width .3s' }} />
                           </div>
                           <span style={{ flex: '0 0 auto', textAlign: 'left', fontSize: '12.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>
